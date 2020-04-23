@@ -206,7 +206,7 @@ def get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp):
 
 
 def isLibero(passaggio_temp, matrice_incrocio_temp):  # controllo se l'incrocio si e' liberato
-    passaggio_nuovo = passaggio_temp.copy()
+    passaggio_nuovo = passaggio_temp[:]
     count = 0
     for x in passaggio_temp:
 
