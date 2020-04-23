@@ -1,7 +1,4 @@
 import BatchLib
-import Traiettorie
-
-direct = "~/SUMO/"  # percorso cartella
 
 f = open("Output/ferme.txt", "w")  # creo file ferme.txt percentuale di auto ferme
 vm = open("Output/vel_med.txt", "w")  # creo file vel_med vel. media delle auto presenti
@@ -16,12 +13,12 @@ t_coda = open("Output/t_in_coda.txt", "w")  # scrivo il tempo medio in coda risp
 from_auto_test = 100  # (per simulazione impostare a 10)
 to_auto_test = 100  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 1  # (per simulazione impostare a 10)
-prove_fissate_auto = 1  # (per simulazione impostare a 10)
+prove_fissate_auto = 10  # (per simulazione impostare a 10)
 max_auto_insieme = 12  # solo per Version4 e Versione7
 gui = True
 n_porta_base = 8000
 prove_una_auto = 1  # (per simulazione impostare a 20)
-celle_per_lato = 22  # per protocolli basati sulla suddivisione matriciale dell'incrocio
+celle_per_lato = 23  # per protocolli basati sulla suddivisione matriciale dell'incrocio
 
 # ---------------------------------------------------------------- #
 #
@@ -31,14 +28,10 @@ tempo_generazione = 600  # fissato
 step0 = 0
 step_sim = 0
 
-traiettorie_matrice = Traiettorie.run(n_porta_base, False, celle_per_lato)
-
 # eseguo prove per rilevare tempo in condizione standard, con una sola auto
 for y in range(0, prove_una_auto):
     n_port = n_porta_base + y + 1
-
-    ret = BatchLib.run(n_port, 1, tempo_generazione, False, celle_per_lato, traiettorie_matrice)
-
+    ret = BatchLib.run(n_port, 1, tempo_generazione, False)
     step_sim += float(ret[4])
 step_sim = round(float(step_sim) / float(prove_una_auto), 4)
 step0 = step_sim  # salvo tempo in situazione base, 1 sola auto senza fermarsi
@@ -62,7 +55,7 @@ for x in range(from_auto_test, to_auto_test+1):
 
             n_port = n_porta_base + (x * step_auto_test) + y
 
-            ret = BatchLib.run(n_port, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice)
+            ret = BatchLib.run(n_port, n_auto, tempo_generazione, gui)
 
             f_t += float(ret[0])
             vm_t += float(ret[1])
@@ -118,5 +111,5 @@ f.close()
 cm.close()
 vm.close()
 t_coda.close()
-print("\n\n\n\n\n\n\n")
+print("\n\n\n\n\n\n\n\n")
 print("FINE")
