@@ -1,4 +1,5 @@
-# Versione11
+# Versione 2.0
+
 Per prima cosa suddivide la dimensione dell’incrocio (grazie anche alla funzione che trova dove sono posizionati gli stop)
 in sezioni, e salva in due vettori gli estremi di ogni cella.
 
