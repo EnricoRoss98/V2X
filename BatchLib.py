@@ -157,6 +157,7 @@ def get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matr
 
 def isLibero(passaggio_temp, matrice_incrocio_temp, passaggio_cella_temp, limiti_celle_X_temp, limiti_celle_Y_temp,
              estremi_incrocio):
+
     # controllo se e' cambiata la situazione all'interno dell'incrocio
     passaggio_nuovo = passaggio_temp.copy()
     passaggio_cella_nuovo = passaggio_cella_temp.copy()
