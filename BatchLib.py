@@ -434,7 +434,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
 
     # print(sumoBinary)
     sumoProcess = subprocess.Popen(
-        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "--time-to-teleport", "-1", "-Q"],
+        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "-S", "--time-to-teleport", "-1", "-Q"],
         stdout=sys.stdout,
         stderr=sys.stderr)
 
