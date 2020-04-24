@@ -162,8 +162,8 @@ def isLibero(passaggio_temp, matrice_incrocio_temp, passaggio_cella_temp, limiti
              estremi_incrocio):
 
     # controllo se e' cambiata la situazione all'interno dell'incrocio
-    passaggio_nuovo = passaggio_temp.copy()
-    passaggio_cella_nuovo = passaggio_cella_temp.copy()
+    passaggio_nuovo = passaggio_temp[:]
+    passaggio_cella_nuovo = passaggio_cella_temp[:]
 
     # print("isLibero")
 
