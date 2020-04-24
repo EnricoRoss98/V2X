@@ -66,10 +66,10 @@ def get_cella_from_pos_auto(auto_temp, limiti_celle_X_temp, limiti_celle_Y_temp)
         if limiti_celle_Y_temp[y] >= pos[1] >= limiti_celle_Y_temp[y + 1]:
             cella_Y = y
 
-    print(limiti_celle_X_temp)
-    print(limiti_celle_Y_temp)
-    print(pos)
-    print(str(cella_X) + " | " + str(cella_Y))
+    # print(limiti_celle_X_temp)
+    # print(limiti_celle_Y_temp)
+    # print(pos)
+    # print(str(cella_X) + " | " + str(cella_Y))
 
     return [auto_temp, cella_X, cella_Y]
 
@@ -120,14 +120,14 @@ def set_in_matrice_incrocio(auto_temp, matrice_incrocio_temp, set_delete, traiet
     for route in traiettorie_matrice_temp:
         if route[0] == rotta:
             for celle in route[1]:
-                print("\n"+str(celle[0])+" | "+str(celle[1]))
+                # print("\n"+str(celle[0])+" | "+str(celle[1]))
                 # scrivo sulla casella centrale e anche sulle 8 caselle circostanti
                 for index_y in range(-1, 2):
                     for index_x in range(-1, 2):
                         if ((celle[0] + index_y) >= 0) and ((celle[1] + index_x) >= 0) and \
                                 ((celle[0] + index_y) < len(matrice_incrocio_temp)) and \
                                 ((celle[1] + index_x) < len(matrice_incrocio_temp)):
-                            print(str(celle[0] + index_y) + " | " + str(celle[1] + index_x))
+                            # print(str(celle[0] + index_y) + " | " + str(celle[1] + index_x))
                             matrice_incrocio_temp[celle[0] + index_y][celle[1] + index_x] = scrivi
 
     return matrice_incrocio_temp
@@ -165,7 +165,7 @@ def isLibero(passaggio_temp, matrice_incrocio_temp, passaggio_cella_temp, limiti
     passaggio_nuovo = passaggio_temp.copy()
     passaggio_cella_nuovo = passaggio_cella_temp.copy()
 
-    print("isLibero")
+    # print("isLibero")
 
     for x in passaggio_temp:
 
@@ -175,25 +175,25 @@ def isLibero(passaggio_temp, matrice_incrocio_temp, passaggio_cella_temp, limiti
             for y in passaggio_cella_temp:
                 if x[0] == y[0]:
 
-                    print(x[0])
+                    # print(x[0])
 
                     pos = traci.vehicle.getPosition(x[0])
                     if in_incrocio(pos, estremi_incrocio):  # se e' ancora nell'incrocio
 
-                        print("inIncrocio")
+                        # print("inIncrocio")
 
                         ritorno = get_cella_from_pos_auto(x[0], limiti_celle_X_temp, limiti_celle_Y_temp)
                         pos_attuale_X = ritorno[1]
                         pos_attuale_Y = ritorno[2]
 
-                        print("Posizione attuale: " + str(pos_attuale_X) + " | " + str(pos_attuale_Y))
+                        # print("Posizione attuale: " + str(pos_attuale_X) + " | " + str(pos_attuale_Y))
 
                         if pos_attuale_X != y[1] or pos_attuale_Y != y[2]:  # se la pos della vettura nelle celle cambia
 
-                            print("Posizione attuale diversa dalla precedente! -> " + str(y[1]) + " | " + str(y[2]))
+                            # print("Posizione attuale diversa dalla precedente! -> " + str(y[1]) + " | " + str(y[2]))
 
                             if y[1] is not None and y[2] is not None:
-                                print("Imposto vecchia cella su cui era a False")
+                                # print("Imposto vecchia cella su cui era a False")
 
                                 # imposto la vecchia cella su cui era a False e anche sulle 8 caselle circostanti
                                 for index_y in range(-1, 2):
@@ -209,7 +209,7 @@ def isLibero(passaggio_temp, matrice_incrocio_temp, passaggio_cella_temp, limiti
                             passaggio_cella_nuovo[passaggio_cella_nuovo.index(y)] = [y[0], pos_attuale_X, pos_attuale_Y]
 
                             y1 = [y[0], pos_attuale_X, pos_attuale_Y]
-                            print("Aggiorno vettore: " + str(passaggio_cella_nuovo[passaggio_cella_nuovo.index(y1)]))
+                            # print("Aggiorno vettore: " + str(passaggio_cella_nuovo[passaggio_cella_nuovo.index(y1)]))
 
                     else:  # altrimenti se l'auto e' uscita dall'incrocio
                         if y[1] is not None and y[2] is not None:  # se None allora non e' ancora entrata e non la tolgo
@@ -615,14 +615,14 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
                     if rotta != "route_2" and rotta != "route_4" and rotta != "route_6" and rotta != "route_11":
                         # se non gira a DX
                         if x[1] is None and x[2] is None:
-                            print("DENTRO!")
+                            # print("DENTRO!")
                             pos = traci.vehicle.getPosition(x[0])
                             if in_incrocio(pos, stop[incrID]):
                                 IDvett = passaggio_cella[incrID].index(x)
-                                print("\nget_cella_from_pos_auto")
+                                # print("\nget_cella_from_pos_auto")
                                 passaggio_cella[incrID][IDvett] = get_cella_from_pos_auto(x[0], limiti_celle_X[incrID],
                                                                                           limiti_celle_Y[incrID])
-                                print("\n")
+                                # print("\n")
 
                 rientro2 = isLibero(passaggio[incrID], matrice_incrocio[incrID], passaggio_cella[incrID],
                                     limiti_celle_X[incrID], limiti_celle_Y[incrID], stop[incrID])
@@ -637,7 +637,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
                         for auto_ferma in ferme[incrID]:
                             if auto_ferma in ferme[incrID]:
                                 if get_from_matrice_incrocio(auto_ferma, matrice_incrocio[incrID], traiettorie_matrice):
-                                    print("Faccio passare la " + str(auto_ferma))
+                                    # print("Faccio passare la " + str(auto_ferma))
                                     # vedo se percorso e' libero, e se si allora la faccio partire
                                     rientro4 = avantiAuto(auto_ferma, passaggio[incrID], attesa[incrID], ferme[incrID],
                                                           matrice_incrocio[incrID], passaggio_cella[incrID],
@@ -653,12 +653,12 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
                 tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
             # STAMPO LA MATRICE
-            print(step)
-            print(passaggio[incrID])
-            print(passaggio_cella[incrID])
-            for x in range(0, celle_per_lato):  # matrice
-                print(matrice_incrocio[incrID][x])
-            print("\n\n")
+            # print(step)
+            # print(passaggio[incrID])
+            # print(passaggio_cella[incrID])
+            # for x in range(0, celle_per_lato):  # matrice
+                # print(matrice_incrocio[incrID][x])
+            # print("\n\n")
 
         if step % 4 == 0:  # ogni 2 step ne calcola output
             file_rit = output(arrayAuto, auto_in_simulazione)  # per generare stringhe di output
