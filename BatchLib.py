@@ -100,6 +100,9 @@ def arrivoAuto(auto_temp, passaggio_temp, ferme_temp, attesa_temp, matrice_incro
         if rotta != "route_2" and rotta != "route_4" and rotta != "route_6" and rotta != "route_11":  # se non gira a DX
             passaggio_cella_temp.append([auto_temp, None, None])
 
+        else:  # se l'auto gira a destra la faccio rallentare fino a dimezzare la velocita'
+            traci.vehicle.setSpeed(auto_temp, traci.vehicle.getMaxSpeed(auto_temp) / float(2))
+
     ritorno = [passaggio_temp, attesa_temp, ferme_temp, matrice_incrocio_temp, passaggio_cella_temp]
     return ritorno
 
@@ -226,6 +229,9 @@ def isLibero(passaggio_temp, matrice_incrocio_temp, passaggio_cella_temp, limiti
             if traci.vehicle.getRoadID(x[0]) == road:
                 passaggio_nuovo.pop(passaggio_nuovo.index(x))  # tolgo da passaggio
 
+                # la faccio riaccelerare il veicolo
+                traci.vehicle.setSpeed(x[0], traci.vehicle.getMaxSpeed(x[0]))
+
     ritorno = [passaggio_nuovo, matrice_incrocio_temp, passaggio_cella_nuovo]
     return ritorno
 
@@ -234,7 +240,7 @@ def avantiAuto(auto_temp, passaggio_temp, attesa_temp, ferme_temp, matrice_incro
                traiettorie_matrice_temp):
     # faccio avanzare auto
 
-    traci.vehicle.setSpeed(auto_temp, 0.5)  # riparte l'auto
+    traci.vehicle.setSpeed(auto_temp, traci.vehicle.getMaxSpeed(auto_temp))  # riparte l'auto
     passaggio_temp.append([auto_temp, traci.vehicle.getRoadID(auto_temp), traci.vehicle.getAngle(auto_temp)])
     matrice_incrocio_temp = set_in_matrice_incrocio(auto_temp, matrice_incrocio_temp, 1,
                                                     traiettorie_matrice_temp)
@@ -269,7 +275,7 @@ def costruzioneArray(arrayAuto_temp):  # costruzione dell'array composto dal nom
     for id_auto in loadedIDList:
         if id_auto not in arrayAuto_temp:
             arrayAuto_temp.append(id_auto)
-            traci.vehicle.setSpeed(id_auto, 0.5)
+            traci.vehicle.setSpeed(id_auto, traci.vehicle.getMaxSpeed(id_auto))
             # print("AUTO INSERT " + id_auto)
 
     arrivedIDList = traci.simulation.getArrivedIDList()  # elimina nell'array le auto arrivate
@@ -403,7 +409,10 @@ def generaVeicoli(n_auto_t, t_gen):
             lane = "0"
         route = "route_" + str(r_route)
         id_veh = "veh_" + str(i)
+
+        # 4 istruzioni sotto permettono di cambiare velocita' massima e accelerazione/decelerazione per la simulazione
         traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "0.5")
+        traci.vehicle.setMaxSpeed(id_veh, 0.5)
         traci.vehicle.setAccel(id_veh, 0.0078125)
         traci.vehicle.setDecel(id_veh, 0.0078125)
 
