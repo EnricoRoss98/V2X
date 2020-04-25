@@ -14,14 +14,13 @@ t_coda = open("Output/t_in_coda.txt", "w")  # scrivo il tempo medio in coda risp
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
 from_auto_test = 10  # (per simulazione impostare a 10)
-to_auto_test = 150  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
+to_auto_test = 100  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 10  # (per simulazione impostare a 10)
 prove_fissate_auto = 10  # (per simulazione impostare a 10)
 max_auto_insieme = 12  # solo per Version4 e Versione7
-gui = False
+gui = True
 n_porta_base = 5000
-prove_una_auto = 20  # (per simulazione impostare a 20)
-celle_per_lato = 22  # per protocolli basati sulla suddivisione matriciale dell'incrocio
+prove_una_auto = 1  # (per simulazione impostare a 20)
 
 # ---------------------------------------------------------------- #
 #
@@ -164,7 +163,7 @@ for x in range(from_auto_test, to_auto_test + 1):
                 print("ESEGUO PROVA " + str(y + 1) + " CON " + str(x) + " AUTO...")
 
                 n_port = n_porta_base + (x * step_auto_test) + y
-                ret = BatchLib.run(n_port, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice)
+                ret = BatchLib.run(n_port, n_auto, tempo_generazione, gui)
 
                 f_t += float(ret[0])
                 vm_t += float(ret[1])
