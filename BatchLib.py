@@ -29,7 +29,8 @@ def stopXY(shape_temp):  # calcolo esrtremi dell'incrocio, dove sono presenti gl
     return stop_temp
 
 
-def arrivoAuto(auto_temp, occupato_temp, passaggio_temp, ferme_temp, attesa_temp):  # gest. arrivo auto in prossim. stop
+def arrivoAuto(auto_temp, occupato_temp, passaggio_temp, ferme_temp, attesa_temp, passate_temp):
+    # gestione arrivo auto in prossimita' dello stop
     # print("Auto " + auto_temp + " vicino allo STOP!")
     if occupato_temp:
         ferme_temp.append(auto_temp)
@@ -38,13 +39,14 @@ def arrivoAuto(auto_temp, occupato_temp, passaggio_temp, ferme_temp, attesa_temp
     else:
         # print("INCROCIO LIBERO!  Auto " + auto_temp + " autorizzata al passaggio")
         occupato_temp = True
+        passate_temp += 1
         passaggio_temp.append([auto_temp, traci.vehicle.getRoadID(auto_temp), traci.vehicle.getAngle(auto_temp)])
         attesa_temp.pop(attesa_temp.index(auto_temp))  # lo tolgo dalla lista d'attesa
-    ritorno = [occupato_temp, passaggio_temp, attesa_temp, ferme_temp]
+    ritorno = [occupato_temp, passaggio_temp, attesa_temp, ferme_temp, passate_temp]
     return ritorno
 
 
-def isLibero(occupato_temp, passaggio_temp):  # controllo se l'incrocio si e' liberato
+def isLibero(occupato_temp, passaggio_temp, passate_temp):  # controllo se l'incrocio si e' liberato
     passaggio_temp2 = passaggio_temp[:]  # altro array al posto di "pop" sul principale (altrimenti si bugga il for)
     for i in range(0, len(passaggio_temp)):
         # print("isLibero count: "+str(i))
@@ -59,16 +61,18 @@ def isLibero(occupato_temp, passaggio_temp):  # controllo se l'incrocio si e' li
 
     if len(passaggio_temp2) == 0:  # se non ci sono auto in passaggio allora incrocio e' libero
         occupato_temp = False
+        passate_temp = 0
         # print("OCCUPATO = FALSE")
-    return occupato_temp, passaggio_temp2
+    return occupato_temp, passaggio_temp2, passate_temp
 
 
-def avantiAuto(occupato_temp, passaggio_temp, attesa_temp, ferme_temp, auto_da_inserire):  # faccio avanzare auto
+def avantiAuto(occupato_temp, passaggio_temp, attesa_temp, ferme_temp, passate_temp, auto_da_inserire):  # avanza auto
     # traci.vehicle.resume(attesa_temp[0])  # faccio ripartire il primo
     # print("AUTO DA INSERIRE: " + auto_da_inserire)
     traci.vehicle.setSpeed(auto_da_inserire, 1.0)  # riparte l'auto
     passaggio_temp.append([auto_da_inserire, traci.vehicle.getRoadID(auto_da_inserire),
                            traci.vehicle.getAngle(auto_da_inserire)])
+    passate_temp += 1
 
     # print("\nResume " + str(attesa_temp[0]))
     # if insieme == 1:
@@ -82,7 +86,7 @@ def avantiAuto(occupato_temp, passaggio_temp, attesa_temp, ferme_temp, auto_da_i
             pass
     attesa_temp.pop(attesa_temp.index(auto_da_inserire))  # tolgo dalla lista d'attesa "auto_da_inserire"
     occupato_temp = True
-    ritorno = [occupato_temp, passaggio_temp, attesa_temp, ferme_temp]
+    ritorno = [occupato_temp, passaggio_temp, attesa_temp, ferme_temp, passate_temp]
     return ritorno
 
 
@@ -207,6 +211,7 @@ def output(arrayAuto_temp, auto_in_simulazione_t):  # scrivo nei file di output 
     return ferme_perc, vmed, cmax, cmed
 
 
+
 def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
     # scrittura nell'array auto_coda per il calcolo del tempo in coda medio rispetto al tempo totale di simulazione
     for auto_temp in arrayAuto_temp:
@@ -216,8 +221,8 @@ def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
             if round(traci.vehicle.getSpeed(auto_temp), 3) == 0:  # se auto ferma allora segno timestep inizio coda
                 auto_coda_temp[auto_temp_ID][0] = step_temp
         if auto_coda_temp[auto_temp_ID][0] != 0 and auto_coda_temp[auto_temp_ID][1] == 0 and \
-                auto_temp not in attesa_temp:  # se non e' piu' in attesa allora segno timestep di fine coda
-            auto_coda_temp[auto_temp_ID][1] = step_temp
+            auto_temp not in attesa_temp:  # se non e' piu' in attesa allora segno timestep di fine coda
+                auto_coda_temp[auto_temp_ID][1] = step_temp
     return auto_coda_temp
 
 
@@ -240,7 +245,7 @@ def generaVeicoli(n_auto_t, t_gen):
         traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "1")
 
 
-def run(port_t, n_auto, t_generazione, gui):
+def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
     # -------- import python modules from the $SUMO_HOME/tools directory --------
     global dist_stop
     try:
@@ -289,6 +294,7 @@ def run(port_t, n_auto, t_generazione, gui):
     stop = []  # di quanto si distanzia lo stop dal centro incrocio [dx, sotto, sx, sopra]
     centerJunctID = []  # coordinate (x,y) del centro di un incrocio
     arrayAuto = []  # contiene lista di auto presenti nella simulazione
+    passate = []  # tiene traccia del numero totale di auto passate per un certo scenario di passaggio compatibile
     tempo_coda = []
 
     rientro4 = [occupato, passaggio, attesa, ferme]
@@ -324,6 +330,7 @@ def run(port_t, n_auto, t_generazione, gui):
         lista_uscita.append([])
         occupato.append(False)
         ferme.append([])
+        passate.append(0)
 
         centerJunctID.append(traci.junction.getPosition(incrNome))  # posizione centro dell'incrocio
 
@@ -379,11 +386,12 @@ def run(port_t, n_auto, t_generazione, gui):
                                 # controllo se auto non ha subito rallentamenti e la fermo in 16 m
                                 if traci.vehicle.getSpeed(auto) == 1:
                                     rientro4 = arrivoAuto(auto, occupato[incrID], passaggio[incrID], ferme[incrID],
-                                                          attesa[incrID])
+                                                          attesa[incrID], passate[incrID])
                                     occupato[incrID] = rientro4[0]
                                     passaggio[incrID] = rientro4[1]
                                     attesa[incrID] = rientro4[2]
                                     ferme[incrID] = rientro4[3]
+                                    passate[incrID] = rientro4[4]
 
                                 # se auto ha subito rallentamenti calcolo dalla sua velocita' in quanti metri
                                 # dall'incrocio si fermerebbe se la facessi rallentare subito, se si va a fermare in
@@ -408,104 +416,105 @@ def run(port_t, n_auto, t_generazione, gui):
 
                                     if dist_to_stop + 2 >= dist_stop:
                                         rientro4 = arrivoAuto(auto, occupato[incrID], passaggio[incrID], ferme[incrID],
-                                                              attesa[incrID])
+                                                              attesa[incrID], passate[incrID])
                                         occupato[incrID] = rientro4[0]
                                         passaggio[incrID] = rientro4[1]
                                         attesa[incrID] = rientro4[2]
                                         ferme[incrID] = rientro4[3]
+                                        passate[incrID] = rientro4[4]
 
             if len(passaggio[incrID]) > 0 and occupato[incrID]:  # auto in passaggio[] check se sono passate
-                rientro2 = isLibero(occupato[incrID], passaggio[incrID])
+                rientro2 = isLibero(occupato[incrID], passaggio[incrID], passate[incrID])
                 occupato[incrID] = rientro2[0]
                 passaggio[incrID] = rientro2[1]
+                passate[incrID] = rientro2[2]
 
                 if len(ferme[incrID]) > 0:  # se ci sono auto ferme, vedo se posso farne partire qualcuna
 
                     if not occupato[incrID]:  # se l'incrocio e' libero e ci sono auto ferme in attesa
                         rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID], ferme[incrID],
-                                              attesa[incrID][0])
-                        # print("ATTESA_0: "+str(attesa[incrID][0]))
+                                              passate[incrID], attesa[incrID][0])
                         occupato[incrID] = rientro4[0]
                         passaggio[incrID] = rientro4[1]
                         attesa[incrID] = rientro4[2]
                         ferme[incrID] = rientro4[3]
+                        passate[incrID] = rientro4[4]
 
                     if occupato[incrID]:
                         for ID_auto_in_passaggio in range(0, len(passaggio[incrID])):
                             for auto_ferme in ferme[incrID]:
 
-                                auto_in_passaggio = passaggio[incrID][ID_auto_in_passaggio][0]
+                                if passate[incrID] < max_auto_insieme:
+                                    auto_in_passaggio = passaggio[incrID][ID_auto_in_passaggio][0]
 
-                                # salvo angoli auto
-                                ang_passaggio = passaggio[incrID][ID_auto_in_passaggio][2]
-                                ang_ferma = traci.vehicle.getAngle(auto_ferme)
-                                # salvo rotte
-                                rotta_passaggio = traci.vehicle.getRouteID(auto_in_passaggio)
-                                rotta_ferma = traci.vehicle.getRouteID(auto_ferme)
+                                    # salvo angoli auto
+                                    ang_passaggio = passaggio[incrID][ID_auto_in_passaggio][2]
+                                    ang_ferma = traci.vehicle.getAngle(auto_ferme)
+                                    # salvo rotte
+                                    rotta_passaggio = traci.vehicle.getRouteID(auto_in_passaggio)
+                                    rotta_ferma = traci.vehicle.getRouteID(auto_ferme)
 
-                                # controllo che le auto che stanno passando non debbano girare a sinistra
-                                if rotta_passaggio != "route_0" and rotta_passaggio != "route_10" and \
-                                        rotta_passaggio != "route_8" and rotta_passaggio != "route_5":
+                                    # controllo che le auto che stanno passando non debbano girare a sinistra
+                                    if rotta_passaggio != "route_0" and rotta_passaggio != "route_10" and \
+                                            rotta_passaggio != "route_8" and rotta_passaggio != "route_5":
 
-                                    if ang_passaggio == ang_ferma and rotta_ferma != "route_0" and \
-                                            rotta_ferma != "route_10" and rotta_ferma != "route_8" and \
-                                            rotta_ferma != "route_5":
-                                        # se occupato ma ci sono auto che provengono con = angolo di quella che sta
-                                        # passando e non devono girare a sinistra allora posso farle partire
-                                        rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
-                                                              ferme[incrID], auto_ferme)
+                                        if ang_passaggio == ang_ferma and rotta_ferma != "route_0" and \
+                                                rotta_ferma != "route_10" and rotta_ferma != "route_8" and \
+                                                rotta_ferma != "route_5":
+                                            # se occupato ma ci sono auto che provengono con = angolo di quella che sta
+                                            # passando e non devono girare a sinistra allora posso farle partire
+                                            rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
+                                                                  ferme[incrID], passate[incrID], auto_ferme)
+                                            occupato[incrID] = rientro4[0]
+                                            passaggio[incrID] = rientro4[1]
+                                            attesa[incrID] = rientro4[2]
+                                            ferme[incrID] = rientro4[3]
+                                            passate[incrID] = rientro4[4]
 
-                                        occupato[incrID] = rientro4[0]
-                                        passaggio[incrID] = rientro4[1]
-                                        attesa[incrID] = rientro4[2]
-                                        ferme[incrID] = rientro4[3]
+                                        elif ((ang_passaggio + 180) % 360 == ang_ferma) and \
+                                                rotta_ferma != "route_0" and \
+                                                rotta_ferma != "route_10" and rotta_ferma != "route_8" and \
+                                                rotta_ferma != "route_5":
+                                            # se occupato ma ci sono auto ferme nella strada opposta che vanno diritte
+                                            # o girano a dx allora posso farle partire
+                                            rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
+                                                                  ferme[incrID], passate[incrID], auto_ferme)
+                                            occupato[incrID] = rientro4[0]
+                                            passaggio[incrID] = rientro4[1]
+                                            attesa[incrID] = rientro4[2]
+                                            ferme[incrID] = rientro4[3]
+                                            passate[incrID] = rientro4[4]
+                                    else:
+                                        # print(str(ang_passaggio) + " | " + str(ang_ferma))
+                                        # print(str(rotta_passaggio) + " | " + str(rotta_ferma))
+                                        # se ci sono altre auto con = angolo che devono girare a sx falle passare
+                                        if (ang_passaggio == ang_ferma) and (rotta_ferma == "route_0" or
+                                                                             rotta_ferma == "route_10" or
+                                                                             rotta_ferma == "route_8" or
+                                                                             rotta_ferma == "route_5"):
+                                            # se occupato ma ci sono auto che provengono con = angolo di quella che sta
+                                            # passando e non devono girare a sinistra allora posso farle partire
+                                            rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
+                                                                  ferme[incrID], passate[incrID], auto_ferme)
+                                            occupato[incrID] = rientro4[0]
+                                            passaggio[incrID] = rientro4[1]
+                                            attesa[incrID] = rientro4[2]
+                                            ferme[incrID] = rientro4[3]
+                                            passate[incrID] = rientro4[4]
 
-                                    elif ((ang_passaggio + 180) % 360 == ang_ferma) and \
-                                            rotta_ferma != "route_0" and \
-                                            rotta_ferma != "route_10" and rotta_ferma != "route_8" and \
-                                            rotta_ferma != "route_5":
-                                        # se occupato ma ci sono auto ferme nella strada opposta che vanno diritte
-                                        # o girano a dx allora posso farle partire
-                                        rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
-                                                              ferme[incrID], auto_ferme)
-                                        occupato[incrID] = rientro4[0]
-                                        passaggio[incrID] = rientro4[1]
-                                        attesa[incrID] = rientro4[2]
-                                        ferme[incrID] = rientro4[3]
-                                else:
-                                    # print(str(ang_passaggio) + " | " + str(ang_ferma))
-                                    # print(str(rotta_passaggio) + " | " + str(rotta_ferma))
-                                    # se ci sono altre auto con = angolo che devono girare a sx falle passare
-                                    if (ang_passaggio == ang_ferma) and (rotta_ferma == "route_0" or
-                                                                         rotta_ferma == "route_10" or
-                                                                         rotta_ferma == "route_8" or
-                                                                         rotta_ferma == "route_5"):
-                                        # se occupato ma ci sono auto che provengono con = angolo di quella che sta
-                                        # passando e non devono girare a sinistra allora posso farle partire
-                                        rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
-                                                              ferme[incrID], auto_ferme)
-
-                                        occupato[incrID] = rientro4[0]
-                                        passaggio[incrID] = rientro4[1]
-                                        attesa[incrID] = rientro4[2]
-                                        ferme[incrID] = rientro4[3]
-
-                                    elif ((ang_passaggio + 180) % 360 == ang_ferma) and (rotta_ferma == "route_0" or
-                                                                                         rotta_ferma == "route_10" or
-                                                                                         rotta_ferma == "route_8" or
-                                                                                         rotta_ferma == "route_5"):
-                                        # se ci sono auto ferme nella strada opposta che devono girare a sinistra
-                                        # allora posso farle partire
-                                        rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
-                                                              ferme[incrID], auto_ferme)
-                                        occupato[incrID] = rientro4[0]
-                                        passaggio[incrID] = rientro4[1]
-                                        attesa[incrID] = rientro4[2]
-                                        ferme[incrID] = rientro4[3]
-
-            # print("PASSAGGIO: " + str(passaggio[incrID]))
-            # print("ATTESA: " + str(attesa[incrID]))
-            # print("OCCUPATO: " + str(occupato[incrID])+"\n")
+                                        elif ((ang_passaggio + 180) % 360 == ang_ferma) and (rotta_ferma == "route_0" or
+                                                                                             rotta_ferma == "route_10" or
+                                                                                             rotta_ferma == "route_8" or
+                                                                                             rotta_ferma == "route_5"):
+                                            # se ci sono auto ferme nella strada opposta che devono girare a sinistra
+                                            # allora posso farle partire
+                                            rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
+                                                                  ferme[incrID], passate[incrID], auto_ferme)
+                                            occupato[incrID] = rientro4[0]
+                                            passaggio[incrID] = rientro4[1]
+                                            attesa[incrID] = rientro4[2]
+                                            ferme[incrID] = rientro4[3]
+                                            passate[incrID] = rientro4[4]
 
             tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
