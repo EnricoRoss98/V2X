@@ -206,7 +206,7 @@ def get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp):
 
 
 def isLibero(passaggio_temp, matrice_incrocio_temp):  # controllo se l'incrocio si e' liberato
-    passaggio_nuovo = passaggio_temp.copy()
+    passaggio_nuovo = passaggio_temp[:]
     count = 0
     for x in passaggio_temp:
 
@@ -411,7 +411,7 @@ def run(port_t, n_auto, t_generazione, gui):
 
     # -------- percorsi cartella e file SUMO --------
 
-    direct = "/Users/Enrico/Documents/TraCI/Incrocio-batch/"  # percorso cartella
+    direct = "SUMO/"  # percorso cartella
     config_sumo = "incrocio.sumo.cfg"  # nome del file SUMO config
 
     # -----------------------------------------------
@@ -579,7 +579,7 @@ def run(port_t, n_auto, t_generazione, gui):
                     for auto_ferma in ferme[incrID]:
                         if auto_ferma in ferme[incrID]:
                             if get_from_matrice_incrocio(auto_ferma, matrice_incrocio[incrID]):
-                                print("Faccio passare la "+str(auto_ferma))
+                                # print("Faccio passare la "+str(auto_ferma))
                                 # vedo se percorso e' libero, e se si allora la faccio partire
                                 rientro4 = avantiAuto(auto_ferma, passaggio[incrID], attesa[incrID], ferme[incrID],
                                                       matrice_incrocio[incrID])
