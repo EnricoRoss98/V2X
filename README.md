@@ -1,2 +1,2 @@
-# Versione 1.1
+# Versione 1.2
 

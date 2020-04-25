@@ -53,11 +53,36 @@ def isLibero(occupato_temp, passaggio_temp):  # controllo se l'incrocio si e' li
     return occupato_temp
 
 
-def avantiAuto(occupato_temp, passaggio_temp, attesa_temp, ferme_temp):  # faccio avanzare la prima in attesa
+def avantiAuto(occupato_temp, passaggio_temp, attesa_temp, ferme_temp, insieme):  # faccio avanzare la prima in attesa
     # traci.vehicle.resume(attesa_temp[0])  # faccio ripartire il primo
     traci.vehicle.setSpeed(attesa_temp[0], 1.0)  # riparte l'auto
-    # print("Resume " + attesa_temp[0])
-    passaggio_temp = [attesa_temp[0], traci.vehicle.getRoadID(attesa_temp[0])]
+
+    # print("\nResume " + str(attesa_temp[0]))
+    # if insieme == 1:
+    #   print("Sta passando " + str(passaggio_temp[0]))
+
+    if insieme == 1:  # in passaggio tengo conto dell'auto che deve fare piu' strada
+        strada1 = traci.vehicle.getRouteID(passaggio_temp[0])  # sta attraversando
+        strada2 = traci.vehicle.getRouteID(attesa_temp[0])  # sta partendo
+
+        # se la seconda gira subito tengo la prima, a meno che anche la seconda non giri subito allora segno la seconda
+        if strada2 == "route_2" or strada2 == "route_4" or strada2 == "route_6" or strada2 == "route_11":
+            if strada1 == "route_2" or strada1 == "route_4" or strada1 == "route_6" or strada1 == "route_11":
+                passaggio_temp = [attesa_temp[0], traci.vehicle.getRoadID(attesa_temp[0])]
+                # print("Segno " + str(passaggio_temp[0]) + " 1 if")
+
+        # se la prima va dritta tengo lei a meno che anche la seconda non vada dritta, allora segno la seconda
+        elif strada1 == "route_1" or strada1 == "route_3" or strada1 == "route_7" or strada1 == "route_9":
+            if strada2 == "route_1" or strada2 == "route_3" or strada2 == "route_7" or strada2 == "route_9":
+                passaggio_temp = [attesa_temp[0], traci.vehicle.getRoadID(attesa_temp[0])]
+                # print("Segno " + str(passaggio_temp[0]) + " 2 if")
+
+        else:
+            passaggio_temp = [attesa_temp[0], traci.vehicle.getRoadID(attesa_temp[0])]
+            # print("Segno " + str(passaggio_temp[0]) + " else")
+
+    else:
+        passaggio_temp = [attesa_temp[0], traci.vehicle.getRoadID(attesa_temp[0])]
 
     # print("avantiAuto: POP " + attesa_temp[0])
 
@@ -203,8 +228,8 @@ def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
             if round(traci.vehicle.getSpeed(auto_temp), 3) == 0:  # se auto ferma allora segno timestep inizio coda
                 auto_coda_temp[auto_temp_ID][0] = step_temp
         if auto_coda_temp[auto_temp_ID][0] != 0 and auto_coda_temp[auto_temp_ID][1] == 0 and \
-                auto_temp not in attesa_temp:  # se non e' piu' in attesa allora segno timestep di fine coda
-            auto_coda_temp[auto_temp_ID][1] = step_temp
+            auto_temp not in attesa_temp:  # se non e' piu' in attesa allora segno timestep di fine coda
+                auto_coda_temp[auto_temp_ID][1] = step_temp
     return auto_coda_temp
 
 
@@ -391,7 +416,7 @@ def run(port_t, n_auto, t_generazione, gui):
 
                                     dist_to_stop = (v_auto * v_auto) / (2 * decel)
 
-                                    if dist_to_stop + 2 >= dist_stop:
+                                    if dist_to_stop+2 >= dist_stop:
                                         rientro4 = arrivoAuto(auto, occupato[incrID], passaggio[incrID], ferme[incrID],
                                                               attesa[incrID])
                                         occupato[incrID] = rientro4[0]
@@ -405,8 +430,16 @@ def run(port_t, n_auto, t_generazione, gui):
                 if len(ferme[incrID]) > 0:  # se ci sono auto ferme, vedo se posso farne partire qualcuna
 
                     if not occupato[incrID]:  # se l'incrocio e' libero e ci sono auto ferme in attesa
-                        rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID], ferme[incrID])
+                        rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID], ferme[incrID], 0)
 
+                        occupato[incrID] = rientro4[0]
+                        passaggio[incrID] = rientro4[1]
+                        attesa[incrID] = rientro4[2]
+                        ferme[incrID] = rientro4[3]
+
+                    elif occupato[incrID] and passaggio[incrID][1] == traci.vehicle.getRoadID(attesa[incrID][0]):
+                        # se occupato ma auto a cui tocca proviene dalla stessa strada di quella che sta passando
+                        rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID], ferme[incrID], 1)
                         occupato[incrID] = rientro4[0]
                         passaggio[incrID] = rientro4[1]
                         attesa[incrID] = rientro4[2]
@@ -465,3 +498,4 @@ def run(port_t, n_auto, t_generazione, gui):
 
     traci.close()
     return f_ret, vm_ret, cm_ret, cx_ret, step, max_t_coda, media_t_med_coda
+
