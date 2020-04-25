@@ -18,9 +18,9 @@ to_auto_test = 100  # (per simulazione impostare a 100 o 200 se abbasatanza effi
 step_auto_test = 10  # (per simulazione impostare a 10)
 prove_fissate_auto = 10  # (per simulazione impostare a 10)
 max_auto_insieme = 12  # solo per Version4 e Versione7
-gui = True
+gui = False
 n_porta_base = 5000
-prove_una_auto = 1  # (per simulazione impostare a 20)
+prove_una_auto = 20  # (per simulazione impostare a 20)
 
 # ---------------------------------------------------------------- #
 #
@@ -42,7 +42,7 @@ step0 = step_sim  # salvo tempo in situazione base, 1 sola auto senza fermarsi
 
 for x in range(from_auto_test, to_auto_test + 1):
     if x % step_auto_test == 0:
-        print("PROVE CON " + str(x) + " AUTO")
+        print("\nPROVE CON " + str(x) + " AUTO\n")
         f_t = 0.0
         vm_t = 0.0
         cm_t = 0.0
