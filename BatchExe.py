@@ -13,14 +13,14 @@ t_coda = open("Output/t_in_coda.txt", "w")  # scrivo il tempo medio in coda risp
 #
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
-from_auto_test = 20  # (per simulazione impostare a 10)
-to_auto_test = 20  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
+from_auto_test = 10  # (per simulazione impostare a 10)
+to_auto_test = 200  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 10  # (per simulazione impostare a 10)
-prove_fissate_auto = 2  # (per simulazione impostare a 10)
+prove_fissate_auto = 10  # (per simulazione impostare a 10)
 max_auto_insieme = 12  # solo per Version4 e Versione7
-gui = True
+gui = False
 n_porta_base = 5000
-prove_una_auto = 1  # (per simulazione impostare a 20)
+prove_una_auto = 20  # (per simulazione impostare a 20)
 
 # ---------------------------------------------------------------- #
 #
@@ -33,7 +33,7 @@ step_sim = 0
 # eseguo prove per rilevare tempo in condizione standard, con una sola auto
 for y in range(0, prove_una_auto):
     n_port = n_porta_base + y + 1
-    ret = BatchLib.run(n_port, 1, tempo_generazione, False, max_auto_insieme)
+    ret = BatchLib.run(n_port, 1, tempo_generazione, False)
     step_sim += float(ret[4])
 
 step_sim = round(float(step_sim) / float(prove_una_auto), 4)
@@ -41,7 +41,7 @@ step0 = step_sim  # salvo tempo in situazione base, 1 sola auto senza fermarsi
 
 for x in range(from_auto_test, to_auto_test + 1):
     if x % step_auto_test == 0:
-        print("PROVE CON " + str(x) + " AUTO")
+        print("\nPROVE CON " + str(x) + " AUTO\n")
         f_t = 0.0
         vm_t = 0.0
         cm_t = 0.0
@@ -55,16 +55,16 @@ for x in range(from_auto_test, to_auto_test + 1):
         if prove_fissate_auto == 10:
             n_port = n_porta_base
             pool = Pool(processes=10)
-            p = pool.apply_async(BatchLib.run, (n_port + 0 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-            p1 = pool.apply_async(BatchLib.run, (n_port + 1 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-            p2 = pool.apply_async(BatchLib.run, (n_port + 2 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-            p3 = pool.apply_async(BatchLib.run, (n_port + 3 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-            p4 = pool.apply_async(BatchLib.run, (n_port + 4 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-            p5 = pool.apply_async(BatchLib.run, (n_port + 5 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-            p6 = pool.apply_async(BatchLib.run, (n_port + 6 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-            p7 = pool.apply_async(BatchLib.run, (n_port + 7 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-            p8 = pool.apply_async(BatchLib.run, (n_port + 8 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-            p9 = pool.apply_async(BatchLib.run, (n_port + 9 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
+            p = pool.apply_async(BatchLib.run, (n_port + 0 + x, n_auto, tempo_generazione, gui))
+            p1 = pool.apply_async(BatchLib.run, (n_port + 1 + x, n_auto, tempo_generazione, gui))
+            p2 = pool.apply_async(BatchLib.run, (n_port + 2 + x, n_auto, tempo_generazione, gui))
+            p3 = pool.apply_async(BatchLib.run, (n_port + 3 + x, n_auto, tempo_generazione, gui))
+            p4 = pool.apply_async(BatchLib.run, (n_port + 4 + x, n_auto, tempo_generazione, gui))
+            p5 = pool.apply_async(BatchLib.run, (n_port + 5 + x, n_auto, tempo_generazione, gui))
+            p6 = pool.apply_async(BatchLib.run, (n_port + 6 + x, n_auto, tempo_generazione, gui))
+            p7 = pool.apply_async(BatchLib.run, (n_port + 7 + x, n_auto, tempo_generazione, gui))
+            p8 = pool.apply_async(BatchLib.run, (n_port + 8 + x, n_auto, tempo_generazione, gui))
+            p9 = pool.apply_async(BatchLib.run, (n_port + 9 + x, n_auto, tempo_generazione, gui))
 
             ret = p.get()
             f_t += float(ret[0])
@@ -162,7 +162,7 @@ for x in range(from_auto_test, to_auto_test + 1):
                 print("ESEGUO PROVA " + str(y + 1) + " CON " + str(x) + " AUTO...")
 
                 n_port = n_porta_base + (x * step_auto_test) + y
-                ret = BatchLib.run(n_port, n_auto, tempo_generazione, gui, max_auto_insieme)
+                ret = BatchLib.run(n_port, n_auto, tempo_generazione, gui)
 
                 f_t += float(ret[0])
                 vm_t += float(ret[1])
