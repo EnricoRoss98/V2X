@@ -18,9 +18,9 @@ to_auto_test = 100  # (per simulazione impostare a 100 o 200 se abbasatanza effi
 step_auto_test = 10  # (per simulazione impostare a 10)
 prove_fissate_auto = 10  # (per simulazione impostare a 10)
 max_auto_insieme = 12  # solo per Version4 e Versione7
-gui = True
+gui = False
 n_porta_base = 5000
-prove_una_auto = 1  # (per simulazione impostare a 20)
+prove_una_auto = 20  # (per simulazione impostare a 20)
 
 # ---------------------------------------------------------------- #
 #
