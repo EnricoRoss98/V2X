@@ -42,7 +42,7 @@ step0 = step_sim  # salvo tempo in situazione base, 1 sola auto senza fermarsi
 
 for x in range(from_auto_test, to_auto_test + 1):
     if x % step_auto_test == 0:
-        print("PROVE CON " + str(x) + " AUTO")
+        print("\nPROVE CON " + str(x) + " AUTO\n")
         f_t = 0.0
         vm_t = 0.0
         cm_t = 0.0
