@@ -41,6 +41,11 @@ def arrivoAuto(auto_temp, occupato_temp, passaggio_temp, ferme_temp, attesa_temp
         occupato_temp = True
         passaggio_temp.append([auto_temp, traci.vehicle.getRoadID(auto_temp), traci.vehicle.getAngle(auto_temp)])
         attesa_temp.pop(attesa_temp.index(auto_temp))  # lo tolgo dalla lista d'attesa
+
+        rotta = traci.vehicle.getRouteID(auto_temp)
+        if rotta == "route_2" or rotta == "route_4" or rotta == "route_6" or rotta == "route_11":  # se gira a DX
+            traci.vehicle.setSpeed(auto_temp, traci.vehicle.getMaxSpeed(auto_temp) / float(2))
+
     ritorno = [occupato_temp, passaggio_temp, attesa_temp, ferme_temp]
     return ritorno
 
@@ -53,6 +58,11 @@ def isLibero(occupato_temp, passaggio_temp):  # controllo se l'incrocio si e' li
             road = prossimaStrada(passaggio_temp[i])  # prossima via
             if traci.vehicle.getRoadID(passaggio_temp[i][0]) == road:  # se l'auto cambia via la tolgo da passaggio
                 # print(passaggio_temp[i][0] + " ESCE!")
+
+                rotta = traci.vehicle.getRouteID(passaggio_temp[i][0])
+                if rotta == "route_2" or rotta == "route_4" or rotta == "route_6" or rotta == "route_11":  # gira a DX
+                    traci.vehicle.setSpeed(passaggio_temp[i][0], traci.vehicle.getMaxSpeed(passaggio_temp[i][0]))
+
                 esce = passaggio_temp[i]
                 if esce in passaggio_temp2:
                     # print("POP! "+passaggio_temp[i][0])
@@ -67,7 +77,11 @@ def isLibero(occupato_temp, passaggio_temp):  # controllo se l'incrocio si e' li
 def avantiAuto(occupato_temp, passaggio_temp, attesa_temp, ferme_temp, auto_da_inserire):  # faccio avanzare auto
     # traci.vehicle.resume(attesa_temp[0])  # faccio ripartire il primo
     # print("AUTO DA INSERIRE: " + auto_da_inserire)
-    traci.vehicle.setSpeed(auto_da_inserire, 1.0)  # riparte l'auto
+    rotta = traci.vehicle.getRouteID(auto_da_inserire)
+    if rotta == "route_2" or rotta == "route_4" or rotta == "route_6" or rotta == "route_11":  # gira a DX
+        traci.vehicle.setSpeed(auto_da_inserire, traci.vehicle.getMaxSpeed(auto_da_inserire) / float(2))
+    else:
+        traci.vehicle.setSpeed(auto_da_inserire, traci.vehicle.getMaxSpeed(auto_da_inserire))  # riparte l'auto
     passaggio_temp.append([auto_da_inserire, traci.vehicle.getRoadID(auto_da_inserire),
                            traci.vehicle.getAngle(auto_da_inserire)])
 
@@ -106,7 +120,7 @@ def costruzioneArray(arrayAuto_temp):  # costruzione dell'array composto dal nom
     for id_auto in loadedIDList:
         if id_auto not in arrayAuto_temp:
             arrayAuto_temp.append(id_auto)
-            traci.vehicle.setSpeed(id_auto, 1.0)
+            traci.vehicle.setSpeed(id_auto, traci.vehicle.getMaxSpeed(id_auto))
             # print("AUTO INSERT " + id_auto)
 
     arrivedIDList = traci.simulation.getArrivedIDList()  # elimina nell'array le auto arrivate
@@ -476,6 +490,7 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
                                     rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
                                                           ferme[incrID], auto_ferme)
 
+                                    passaggio[incrID] = rientro4[1]
                                     attesa[incrID] = rientro4[2]
                                     ferme[incrID] = rientro4[3]
 
