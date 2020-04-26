@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Mar  7 Apr 15:32:33 2020 by Eclipse SUMO netedit Version be133264
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <sumo-net-file value="/Users/Enrico/Documents/TraCI/Incrocio-batch/incrocio.net.xml"/>
+    </input>
+
+    <output>
+        <output-file value="/Users/Enrico/Documents/TraCI/Incrocio-batch/incrocio.net.xml"/>
+    </output>
+
+    <processing>
+        <geometry.min-radius.fix.railways value="false"/>
+        <geometry.max-grade.fix value="false"/>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="false"/>
+    </processing>
+
+    <junctions>
+        <no-turnarounds value="true"/>
+        <junctions.corner-detail value="5"/>
+        <junctions.limit-turn-speed value="0.8"/>
+        <rectangular-lane-cut value="false"/>
+    </junctions>
+
+    <pedestrian>
+        <walkingareas value="false"/>
+    </pedestrian>
+
+    <report>
+        <aggregate-warnings value="5"/>
+    </report>
+
+</configuration>
+-->
+
+<net version="1.6" junctionCornerDetail="5" limitTurnSpeed="0.80" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="0.00,0.00" convBoundary="-100.00,-100.00,100.00,100.00" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/>
+
+    <edge id=":centro_0" function="internal">
+        <lane id=":centro_0_0" index="0" speed="2.48" length="9.03" shape="-8.00,13.60 -8.35,11.15 -9.40,9.40 -11.15,8.35 -13.60,8.00"/>
+    </edge>
+    <edge id=":centro_1" function="internal">
+        <lane id=":centro_1_0" index="0" speed="10.00" length="27.20" shape="-4.80,13.60 -4.80,-13.60"/>
+    </edge>
+    <edge id=":centro_2" function="internal">
+        <lane id=":centro_2_0" index="0" speed="3.85" length="23.22" shape="-1.60,13.60 -0.23,8.20 3.31,3.31 8.20,-0.23 13.60,-1.60"/>
+    </edge>
+    <edge id=":centro_3" function="internal">
+        <lane id=":centro_3_0" index="0" speed="2.48" length="9.03" shape="13.60,8.00 11.15,8.35 9.40,9.40 8.35,11.15 8.00,13.60"/>
+    </edge>
+    <edge id=":centro_4" function="internal">
+        <lane id=":centro_4_0" index="0" speed="10.00" length="27.20" shape="13.60,4.80 -13.60,4.80"/>
+    </edge>
+    <edge id=":centro_5" function="internal">
+        <lane id=":centro_5_0" index="0" speed="3.85" length="23.22" shape="13.60,1.60 8.20,0.23 3.31,-3.31 -0.23,-8.20 -1.60,-13.60"/>
+    </edge>
+    <edge id=":centro_6" function="internal">
+        <lane id=":centro_6_0" index="0" speed="2.48" length="9.03" shape="8.00,-13.60 8.35,-11.15 9.40,-9.40 11.15,-8.35 13.60,-8.00"/>
+    </edge>
+    <edge id=":centro_7" function="internal">
+        <lane id=":centro_7_0" index="0" speed="10.00" length="27.20" shape="4.80,-13.60 4.80,13.60"/>
+    </edge>
+    <edge id=":centro_8" function="internal">
+        <lane id=":centro_8_0" index="0" speed="3.85" length="23.22" shape="1.60,-13.60 0.23,-8.20 -3.31,-3.31 -8.20,0.23 -13.60,1.60"/>
+    </edge>
+    <edge id=":centro_9" function="internal">
+        <lane id=":centro_9_0" index="0" speed="2.48" length="9.03" shape="-13.60,-8.00 -11.15,-8.35 -9.40,-9.40 -8.35,-11.15 -8.00,-13.60"/>
+    </edge>
+    <edge id=":centro_10" function="internal">
+        <lane id=":centro_10_0" index="0" speed="10.00" length="27.20" shape="-13.60,-4.80 13.60,-4.80"/>
+    </edge>
+    <edge id=":centro_11" function="internal">
+        <lane id=":centro_11_0" index="0" speed="3.85" length="23.22" shape="-13.60,-1.60 -8.20,-0.23 -3.31,3.31 0.23,8.20 1.60,13.60"/>
+    </edge>
+
+    <edge id="centr-to-destr" from="centro" to="destra" priority="-1">
+        <lane id="centr-to-destr_0" index="0" speed="10.00" length="86.40" shape="13.60,-8.00 100.00,-8.00"/>
+        <lane id="centr-to-destr_1" index="1" speed="10.00" length="86.40" shape="13.60,-4.80 100.00,-4.80"/>
+        <lane id="centr-to-destr_2" index="2" speed="10.00" length="86.40" shape="13.60,-1.60 100.00,-1.60"/>
+    </edge>
+    <edge id="centr-to-sinis" from="centro" to="sinistra" priority="-1">
+        <lane id="centr-to-sinis_0" index="0" speed="10.00" length="86.40" shape="-13.60,8.00 -100.00,8.00"/>
+        <lane id="centr-to-sinis_1" index="1" speed="10.00" length="86.40" shape="-13.60,4.80 -100.00,4.80"/>
+        <lane id="centr-to-sinis_2" index="2" speed="10.00" length="86.40" shape="-13.60,1.60 -100.00,1.60"/>
+    </edge>
+    <edge id="centr-to-sopra" from="centro" to="sopra" priority="-1">
+        <lane id="centr-to-sopra_0" index="0" speed="10.00" length="86.40" shape="8.00,13.60 8.00,100.00"/>
+        <lane id="centr-to-sopra_1" index="1" speed="10.00" length="86.40" shape="4.80,13.60 4.80,100.00"/>
+        <lane id="centr-to-sopra_2" index="2" speed="10.00" length="86.40" shape="1.60,13.60 1.60,100.00"/>
+    </edge>
+    <edge id="centr-to-sotto" from="centro" to="sotto" priority="-1">
+        <lane id="centr-to-sotto_0" index="0" speed="10.00" length="86.40" shape="-8.00,-13.60 -8.00,-100.00"/>
+        <lane id="centr-to-sotto_1" index="1" speed="10.00" length="86.40" shape="-4.80,-13.60 -4.80,-100.00"/>
+        <lane id="centr-to-sotto_2" index="2" speed="10.00" length="86.40" shape="-1.60,-13.60 -1.60,-100.00"/>
+    </edge>
+    <edge id="destr-to-centr" from="destra" to="centro" priority="-1">
+        <lane id="destr-to-centr_0" index="0" speed="10.00" length="86.40" shape="100.00,8.00 13.60,8.00"/>
+        <lane id="destr-to-centr_1" index="1" speed="10.00" length="86.40" shape="100.00,4.80 13.60,4.80"/>
+        <lane id="destr-to-centr_2" index="2" speed="10.00" length="86.40" shape="100.00,1.60 13.60,1.60"/>
+    </edge>
+    <edge id="sinis-to-centr" from="sinistra" to="centro" priority="-1">
+        <lane id="sinis-to-centr_0" index="0" speed="10.00" length="86.40" shape="-100.00,-8.00 -13.60,-8.00"/>
+        <lane id="sinis-to-centr_1" index="1" speed="10.00" length="86.40" shape="-100.00,-4.80 -13.60,-4.80"/>
+        <lane id="sinis-to-centr_2" index="2" speed="10.00" length="86.40" shape="-100.00,-1.60 -13.60,-1.60"/>
+    </edge>
+    <edge id="sopra-to-centr" from="sopra" to="centro" priority="-1">
+        <lane id="sopra-to-centr_0" index="0" speed="10.00" length="86.40" shape="-8.00,100.00 -8.00,13.60"/>
+        <lane id="sopra-to-centr_1" index="1" speed="10.00" length="86.40" shape="-4.80,100.00 -4.80,13.60"/>
+        <lane id="sopra-to-centr_2" index="2" speed="10.00" length="86.40" shape="-1.60,100.00 -1.60,13.60"/>
+    </edge>
+    <edge id="sotto-to-centr" from="sotto" to="centro" priority="-1">
+        <lane id="sotto-to-centr_0" index="0" speed="10.00" length="86.40" shape="8.00,-100.00 8.00,-13.60"/>
+        <lane id="sotto-to-centr_1" index="1" speed="10.00" length="86.40" shape="4.80,-100.00 4.80,-13.60"/>
+        <lane id="sotto-to-centr_2" index="2" speed="10.00" length="86.40" shape="1.60,-100.00 1.60,-13.60"/>
+    </edge>
+
+    <junction id="centro" type="district" x="0.00" y="0.00" incLanes="sopra-to-centr_0 sopra-to-centr_1 sopra-to-centr_2 destr-to-centr_0 destr-to-centr_1 destr-to-centr_2 sotto-to-centr_0 sotto-to-centr_1 sotto-to-centr_2 sinis-to-centr_0 sinis-to-centr_1 sinis-to-centr_2" intLanes=":centro_0_0 :centro_1_0 :centro_2_0 :centro_3_0 :centro_4_0 :centro_5_0 :centro_6_0 :centro_7_0 :centro_8_0 :centro_9_0 :centro_10_0 :centro_11_0" shape="-9.60,13.60 9.60,13.60 10.04,11.38 10.60,10.60 11.38,10.04 12.38,9.71 13.60,9.60 13.60,-9.60 11.38,-10.04 10.60,-10.60 10.04,-11.38 9.71,-12.38 9.60,-13.60 -9.60,-13.60 -10.04,-11.38 -10.60,-10.60 -11.38,-10.04 -12.38,-9.71 -13.60,-9.60 -13.60,9.60 -11.38,10.04 -10.60,10.60 -10.04,11.38 -9.71,12.38"/>
+    <junction id="destra" type="dead_end" x="100.00" y="0.00" incLanes="centr-to-destr_0 centr-to-destr_1 centr-to-destr_2" intLanes="" shape="100.00,0.00 100.00,-9.60 100.00,0.00"/>
+    <junction id="sinistra" type="dead_end" x="-100.00" y="0.00" incLanes="centr-to-sinis_0 centr-to-sinis_1 centr-to-sinis_2" intLanes="" shape="-100.00,0.00 -100.00,9.60 -100.00,0.00"/>
+    <junction id="sopra" type="dead_end" x="0.00" y="100.00" incLanes="centr-to-sopra_0 centr-to-sopra_1 centr-to-sopra_2" intLanes="" shape="0.00,100.00 9.60,100.00 0.00,100.00"/>
+    <junction id="sotto" type="dead_end" x="0.00" y="-100.00" incLanes="centr-to-sotto_0 centr-to-sotto_1 centr-to-sotto_2" intLanes="" shape="0.00,-100.00 -9.60,-100.00 0.00,-100.00"/>
+
+    <connection from="destr-to-centr" to="centr-to-sopra" fromLane="0" toLane="0" via=":centro_3_0" dir="r" state="M"/>
+    <connection from="destr-to-centr" to="centr-to-sinis" fromLane="1" toLane="1" via=":centro_4_0" dir="s" state="M"/>
+    <connection from="destr-to-centr" to="centr-to-sotto" fromLane="2" toLane="2" via=":centro_5_0" dir="l" state="M"/>
+    <connection from="sinis-to-centr" to="centr-to-sotto" fromLane="0" toLane="0" via=":centro_9_0" dir="r" state="M"/>
+    <connection from="sinis-to-centr" to="centr-to-destr" fromLane="1" toLane="1" via=":centro_10_0" dir="s" state="M"/>
+    <connection from="sinis-to-centr" to="centr-to-sopra" fromLane="2" toLane="2" via=":centro_11_0" dir="l" state="M"/>
+    <connection from="sopra-to-centr" to="centr-to-sinis" fromLane="0" toLane="0" via=":centro_0_0" dir="r" state="M"/>
+    <connection from="sopra-to-centr" to="centr-to-sotto" fromLane="1" toLane="1" via=":centro_1_0" dir="s" state="M"/>
+    <connection from="sopra-to-centr" to="centr-to-destr" fromLane="2" toLane="2" via=":centro_2_0" dir="l" state="M"/>
+    <connection from="sotto-to-centr" to="centr-to-destr" fromLane="0" toLane="0" via=":centro_6_0" dir="r" state="M"/>
+    <connection from="sotto-to-centr" to="centr-to-sopra" fromLane="1" toLane="1" via=":centro_7_0" dir="s" state="M"/>
+    <connection from="sotto-to-centr" to="centr-to-sinis" fromLane="2" toLane="2" via=":centro_8_0" dir="l" state="M"/>
+
+    <connection from=":centro_0" to="centr-to-sinis" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":centro_1" to="centr-to-sotto" fromLane="0" toLane="1" dir="s" state="M"/>
+    <connection from=":centro_2" to="centr-to-destr" fromLane="0" toLane="2" dir="l" state="M"/>
+    <connection from=":centro_3" to="centr-to-sopra" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":centro_4" to="centr-to-sinis" fromLane="0" toLane="1" dir="s" state="M"/>
+    <connection from=":centro_5" to="centr-to-sotto" fromLane="0" toLane="2" dir="l" state="M"/>
+    <connection from=":centro_6" to="centr-to-destr" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":centro_7" to="centr-to-sopra" fromLane="0" toLane="1" dir="s" state="M"/>
+    <connection from=":centro_8" to="centr-to-sinis" fromLane="0" toLane="2" dir="l" state="M"/>
+    <connection from=":centro_9" to="centr-to-sotto" fromLane="0" toLane="0" dir="r" state="M"/>
+    <connection from=":centro_10" to="centr-to-destr" fromLane="0" toLane="1" dir="s" state="M"/>
+    <connection from=":centro_11" to="centr-to-sopra" fromLane="0" toLane="2" dir="l" state="M"/>
+
+</net>

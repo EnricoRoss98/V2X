@@ -217,8 +217,8 @@ def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
             if round(traci.vehicle.getSpeed(auto_temp), 3) == 0:  # se auto ferma allora segno timestep inizio coda
                 auto_coda_temp[auto_temp_ID][0] = step_temp
         if auto_coda_temp[auto_temp_ID][0] != 0 and auto_coda_temp[auto_temp_ID][1] == 0 and \
-            auto_temp not in attesa_temp:  # se non e' piu' in attesa allora segno timestep di fine coda
-                auto_coda_temp[auto_temp_ID][1] = step_temp
+                auto_temp not in attesa_temp:  # se non e' piu' in attesa allora segno timestep di fine coda
+            auto_coda_temp[auto_temp_ID][1] = step_temp
     return auto_coda_temp
 
 
@@ -291,11 +291,10 @@ def run(port_t, n_auto, t_generazione, gui):
     centerJunctID = []  # coordinate (x,y) del centro di un incrocio
     arrayAuto = []  # contiene lista di auto presenti nella simulazione
     tempo_coda = []
+    tutte_svolta_a_dx = False
 
     conta_passaggi = []  # contatore che tiene conto dei passaggi
     conta_passaggi_old = []  # contatore che tiene conto dei precedenti passaggi
-
-    condizione_passaggio = []
 
     rientro4 = [occupato, passaggio, attesa, ferme]
 
@@ -332,7 +331,6 @@ def run(port_t, n_auto, t_generazione, gui):
         ferme.append([])
         conta_passaggi.append(0)
         conta_passaggi_old.append(0)
-        condizione_passaggio.append(0)
 
         centerJunctID.append(traci.junction.getPosition(incrNome))  # posizione centro dell'incrocio
 
@@ -423,6 +421,17 @@ def run(port_t, n_auto, t_generazione, gui):
                                         attesa[incrID] = rientro4[2]
                                         ferme[incrID] = rientro4[3]
 
+            # se ci sono auto in passaggio ma se girano tutte a destra allora cambia condizione di passaggio
+            if passaggio[incrID]:
+                tutte_svolta_a_dx = True  # controllo se tutte le auto girano a destra
+                for ID_auto_in_passaggio in range(0, len(passaggio[incrID])):
+                    auto_in_passaggio = passaggio[incrID][ID_auto_in_passaggio][0]
+                    rotta_passaggio = traci.vehicle.getRouteID(auto_in_passaggio)  # salvo rotta
+                    if rotta_passaggio != "route_2" and rotta_passaggio != "route_4" and \
+                            rotta_passaggio != "route_6" and rotta_passaggio != "route_11":
+                        tutte_svolta_a_dx = False
+                        break
+
             if len(passaggio[incrID]) > 0 and occupato[incrID]:  # auto in passaggio[] check se sono passate
                 rientro2 = isLibero(occupato[incrID], passaggio[incrID])
                 occupato[incrID] = rientro2[0]
@@ -430,7 +439,8 @@ def run(port_t, n_auto, t_generazione, gui):
 
                 if len(ferme[incrID]) > 0:  # se ci sono auto ferme, vedo se posso farne partire qualcuna
 
-                    if not occupato[incrID]:  # se l'incrocio e' libero e ci sono auto ferme in attesa
+                    # se l'incrocio e' libero e ci sono auto ferme in attesa OR se tutte quelle che passano girano a DX
+                    if not occupato[incrID] or tutte_svolta_a_dx:
                         rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID], ferme[incrID],
                                               attesa[incrID][0])
                         # print("ATTESA_0: "+str(attesa[incrID][0]))
@@ -440,31 +450,51 @@ def run(port_t, n_auto, t_generazione, gui):
                         ferme[incrID] = rientro4[3]
                         conta_passaggi[incrID] += 1
 
+                    auto_svolta_a_sx = False  # controllo se almeno una auto in passaggio debba svoltare a sinistra
+                    for ID_auto_in_passaggio in range(0, len(passaggio[incrID])):
+                        auto_in_passaggio = passaggio[incrID][ID_auto_in_passaggio][0]
+                        rotta_passaggio = traci.vehicle.getRouteID(auto_in_passaggio)  # salvo rotta
+                        if rotta_passaggio == "route_0" or rotta_passaggio == "route_10" or \
+                                rotta_passaggio == "route_8" or rotta_passaggio == "route_5":
+                            auto_svolta_a_sx = True
+
                     if occupato[incrID]:
                         for ID_auto_in_passaggio in range(0, len(passaggio[incrID])):
                             for auto_ferme in ferme[incrID]:
 
-                                # print("\nconta_passaggi: " + str(conta_passaggi[incrID]))
+                                # salvo rotta auto in passaggio
+                                auto_in_passaggio = passaggio[incrID][ID_auto_in_passaggio][0]
+                                rotta_passaggio = traci.vehicle.getRouteID(auto_in_passaggio)
+                                # salvo angoli auto
+                                ang_passaggio = passaggio[incrID][ID_auto_in_passaggio][2]
+                                ang_ferma = traci.vehicle.getAngle(auto_ferme)
+                                # salvo rotta per l'auto ferma presa in cosiderazione
+                                rotta_ferma = traci.vehicle.getRouteID(auto_ferme)
+
+                                if rotta_ferma == "route_2" or rotta_ferma == "route_4" or \
+                                        rotta_ferma == "route_6" or rotta_ferma == "route_11":
+                                    # se ocupato ma ci sono auto che girano a destra le faccio sempre passare
+                                    rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
+                                                          ferme[incrID], auto_ferme)
+
+                                    attesa[incrID] = rientro4[2]
+                                    ferme[incrID] = rientro4[3]
+
                                 if conta_passaggi[incrID] > 0:
 
-                                    auto_in_passaggio = passaggio[incrID][ID_auto_in_passaggio][0]
-
-                                    # salvo angoli auto
-                                    ang_passaggio = passaggio[incrID][ID_auto_in_passaggio][2]
-                                    ang_ferma = traci.vehicle.getAngle(auto_ferme)
-                                    # salvo rotte
-                                    rotta_passaggio = traci.vehicle.getRouteID(auto_in_passaggio)
-                                    rotta_ferma = traci.vehicle.getRouteID(auto_ferme)
+                                    if rotta_passaggio == "route_2" or rotta_passaggio == "route_4" or \
+                                            rotta_passaggio == "route_6" or rotta_passaggio == "route_11":
+                                        break
 
                                     # controllo che le auto che stanno passando non debbano girare a sinistra
-                                    if rotta_passaggio != "route_0" and rotta_passaggio != "route_10" and \
-                                            rotta_passaggio != "route_8" and rotta_passaggio != "route_5":
+                                    if not auto_svolta_a_sx:
 
-                                        if ang_passaggio == ang_ferma and rotta_ferma != "route_0" and \
-                                                rotta_ferma != "route_10" and rotta_ferma != "route_8" and \
-                                                rotta_ferma != "route_5":
+                                        if (ang_passaggio == ang_ferma) and (rotta_ferma == "route_1" or
+                                                                             rotta_ferma == "route_3" or
+                                                                             rotta_ferma == "route_7" or
+                                                                             rotta_ferma == "route_9"):
                                             # se occupato ma ci sono auto che provengono con = angolo di quella che sta
-                                            # passando e non devono girare a sinistra allora posso farle partire
+                                            # passando e devono andare diritte allora posso farle partire
                                             rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
                                                                   ferme[incrID], auto_ferme)
 
@@ -473,14 +503,13 @@ def run(port_t, n_auto, t_generazione, gui):
                                             attesa[incrID] = rientro4[2]
                                             ferme[incrID] = rientro4[3]
                                             conta_passaggi[incrID] += 1
-                                            condizione_passaggio[incrID] = 0
 
-                                        elif ((ang_passaggio + 180) % 360 == ang_ferma) and \
-                                                rotta_ferma != "route_0" and \
-                                                rotta_ferma != "route_10" and rotta_ferma != "route_8" and \
-                                                rotta_ferma != "route_5":
+                                        elif ((ang_passaggio + 180) % 360 == ang_ferma) and (rotta_ferma == "route_1" or
+                                                                                             rotta_ferma == "route_3" or
+                                                                                             rotta_ferma == "route_7" or
+                                                                                             rotta_ferma == "route_9"):
                                             # se occupato ma ci sono auto ferme nella strada opposta che vanno diritte
-                                            # o girano a dx allora posso farle partire
+                                            # allora posso farle partire
                                             rientro4 = avantiAuto(occupato[incrID], passaggio[incrID], attesa[incrID],
                                                                   ferme[incrID], auto_ferme)
                                             occupato[incrID] = rientro4[0]
@@ -488,7 +517,6 @@ def run(port_t, n_auto, t_generazione, gui):
                                             attesa[incrID] = rientro4[2]
                                             ferme[incrID] = rientro4[3]
                                             conta_passaggi[incrID] += 1
-                                            condizione_passaggio[incrID] = 0
 
                                     else:
                                         # print(str(ang_passaggio) + " | " + str(ang_ferma))
@@ -508,7 +536,6 @@ def run(port_t, n_auto, t_generazione, gui):
                                             attesa[incrID] = rientro4[2]
                                             ferme[incrID] = rientro4[3]
                                             conta_passaggi[incrID] += 1
-                                            condizione_passaggio[incrID] = 1
 
                                         elif ((ang_passaggio + 180) % 360 == ang_ferma) and (rotta_ferma == "route_0" or
                                                                                              rotta_ferma == "route_10" or
@@ -523,39 +550,22 @@ def run(port_t, n_auto, t_generazione, gui):
                                             attesa[incrID] = rientro4[2]
                                             ferme[incrID] = rientro4[3]
                                             conta_passaggi[incrID] += 1
-                                            condizione_passaggio[incrID] = 1
 
-            if condizione_passaggio[incrID] == 1:  # condizione con auto che girano a sx
-                if conta_passaggi_old[incrID] > 4:
-                    if step % 10 == 0:  # controllo contatore passaggi
-                        if conta_passaggi_old[incrID] < conta_passaggi[incrID]:
-                            conta_passaggi_old[incrID] = conta_passaggi[incrID]
-                        else:
-                            conta_passaggi[incrID] = 0
-                            conta_passaggi_old[incrID] = 0
-                else:
-                    if step % 15 == 0:  # controllo contatore passaggi
-                        if conta_passaggi_old[incrID] < conta_passaggi[incrID]:
-                            conta_passaggi_old[incrID] = conta_passaggi[incrID]
-                        else:
-                            conta_passaggi[incrID] = 0
-                            conta_passaggi_old[incrID] = 0
-
-            if condizione_passaggio[incrID] == 0:  # condizione con auto che vanno diritte o girano a dx
-                if conta_passaggi_old[incrID] > 4:
-                    if step % 13 == 0:  # controllo contatore passaggi
-                        if conta_passaggi_old[incrID] + 1 < conta_passaggi[incrID]:
-                            conta_passaggi_old[incrID] = conta_passaggi[incrID]
-                        else:
-                            conta_passaggi[incrID] = 0
-                            conta_passaggi_old[incrID] = 0
-                else:
-                    if step % 15 == 0:  # controllo contatore passaggi
-                        if conta_passaggi_old[incrID] < conta_passaggi[incrID]:
-                            conta_passaggi_old[incrID] = conta_passaggi[incrID]
-                        else:
-                            conta_passaggi[incrID] = 0
-                            conta_passaggi_old[incrID] = 0
+            # controllo per cambio strategia di passaggio se non passano auto (o poche) tra due rilevazioni successive
+            if conta_passaggi_old[incrID] > 4:  # permetto in questo modo alle auto di accelerarsi e arrivare a regime
+                if step % 10 == 0:  # controllo contatore passaggi
+                    if conta_passaggi_old[incrID] + 1 < conta_passaggi[incrID]:
+                        conta_passaggi_old[incrID] = conta_passaggi[incrID]
+                    else:
+                        conta_passaggi[incrID] = 0
+                        conta_passaggi_old[incrID] = 0
+            else:
+                if step % 15 == 0:  # controllo contatore passaggi
+                    if conta_passaggi_old[incrID] < conta_passaggi[incrID]:
+                        conta_passaggi_old[incrID] = conta_passaggi[incrID]
+                    else:
+                        conta_passaggi[incrID] = 0
+                        conta_passaggi_old[incrID] = 0
 
             tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
