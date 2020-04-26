@@ -275,7 +275,7 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
     # -------- percorsi cartella e file SUMO --------
 
-    direct = "/Users/Enrico/Documents/TraCI/Incrocio-batch/"  # percorso cartella
+    direct = "SUMO/"  # percorso cartella
     config_sumo = "incrocio.sumo.cfg"  # nome del file SUMO config
 
     # -----------------------------------------------
