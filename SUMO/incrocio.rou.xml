@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Thu Apr  2 11:21:06 2020 by Eclipse SUMO netedit Version be133264
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <sumo-net-file value="/Users/Enrico/Documents/TraCI/Incrocio-batch/incrocio.net.xml"/>
+    </input>
+
+    <output>
+        <output-file value="/Users/Enrico/Documents/TraCI/Incrocio-batch/incrocio.net.xml"/>
+    </output>
+
+    <processing>
+        <geometry.min-radius.fix.railways value="false"/>
+        <geometry.max-grade.fix value="false"/>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="false"/>
+    </processing>
+
+    <junctions>
+        <no-turnarounds value="true"/>
+        <junctions.corner-detail value="5"/>
+        <junctions.limit-turn-speed value="0.8"/>
+        <rectangular-lane-cut value="false"/>
+    </junctions>
+
+    <pedestrian>
+        <walkingareas value="false"/>
+    </pedestrian>
+
+    <netedit>
+        <route-files value="/Users/Enrico/Documents/TraCI/Incrocio-corsie/incrocio.rou.xml"/>
+    </netedit>
+
+    <report>
+        <aggregate-warnings value="5"/>
+    </report>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="Car" maxSpeed="1.00" vClass="passenger" accel="0.03125" decel="0.03125"/>
+    <route edges="sotto-to-centr centr-to-sinis" color="green" id="route_0"/>
+    <route edges="sotto-to-centr centr-to-sopra" color="green" id="route_1"/>
+    <route edges="sotto-to-centr centr-to-destr" color="green" id="route_2"/>
+    <route edges="destr-to-centr centr-to-sinis" color="green" id="route_3"/>
+    <route edges="destr-to-centr centr-to-sopra" color="green" id="route_4"/>
+    <route edges="destr-to-centr centr-to-sotto" color="green" id="route_5"/>
+    <route edges="sopra-to-centr centr-to-sinis" color="green" id="route_6"/>
+    <route edges="sopra-to-centr centr-to-sotto" color="green" id="route_7"/>
+    <route edges="sopra-to-centr centr-to-destr" color="green" id="route_8"/>
+    <route edges="sinis-to-centr centr-to-destr" color="green" id="route_9"/>
+    <route edges="sinis-to-centr centr-to-sopra" color="green" id="route_10"/>
+    <route edges="sinis-to-centr centr-to-sotto" color="green" id="route_11"/>
+</routes>
