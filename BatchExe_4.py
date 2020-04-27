@@ -53,23 +53,18 @@ def main(max_auto_insieme):
 
             n_auto = x
 
-            if prove_fissate_auto == 6:
-                n_port = n_porta_base
-                pool = Pool(processes=10)
-                p = pool.apply_async(BatchLib.run,
-                                     (n_port + 0 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-                p1 = pool.apply_async(BatchLib.run,
-                                      (n_port + 1 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-                p2 = pool.apply_async(BatchLib.run,
-                                      (n_port + 2 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-                p3 = pool.apply_async(BatchLib.run,
-                                      (n_port + 3 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-                p4 = pool.apply_async(BatchLib.run,
-                                      (n_port + 4 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
-                p5 = pool.apply_async(BatchLib.run,
-                                      (n_port + 5 + x, n_auto, tempo_generazione, gui, max_auto_insieme))
+            n_port = n_porta_base
+            pool = Pool(processes=prove_fissate_auto)
+            pool_arr = []
+            for y in range(0, prove_fissate_auto):
+                print("")
+                print("ESEGUO PROVA CON " + str(x) + " AUTO...")
 
-                ret = p.get()
+                pool_arr.append(pool.apply_async(BatchLib.run,
+                                                 (n_port + x + y, n_auto, tempo_generazione, gui, max_auto_insieme)))
+
+            for y in range(0, prove_fissate_auto):
+                ret = pool_arr[y].get()
                 f_t += float(ret[0])
                 vm_t += float(ret[1])
                 cm_t += float(ret[2])
@@ -77,66 +72,6 @@ def main(max_auto_insieme):
                 step_sim += float(ret[4])
                 max_t_coda += float(ret[5])
                 t_med_coda += float(ret[6])
-
-                ret = p1.get()
-                f_t += float(ret[0])
-                vm_t += float(ret[1])
-                cm_t += float(ret[2])
-                cx_t += float(ret[3])
-                step_sim += float(ret[4])
-                max_t_coda += float(ret[5])
-                t_med_coda += float(ret[6])
-
-                ret = p2.get()
-                f_t += float(ret[0])
-                vm_t += float(ret[1])
-                cm_t += float(ret[2])
-                cx_t += float(ret[3])
-                step_sim += float(ret[4])
-                max_t_coda += float(ret[5])
-                t_med_coda += float(ret[6])
-
-                ret = p3.get()
-                f_t += float(ret[0])
-                vm_t += float(ret[1])
-                cm_t += float(ret[2])
-                cx_t += float(ret[3])
-                step_sim += float(ret[4])
-                max_t_coda += float(ret[5])
-                t_med_coda += float(ret[6])
-
-                ret = p4.get()
-                f_t += float(ret[0])
-                vm_t += float(ret[1])
-                cm_t += float(ret[2])
-                cx_t += float(ret[3])
-                step_sim += float(ret[4])
-                max_t_coda += float(ret[5])
-                t_med_coda += float(ret[6])
-
-                ret = p5.get()
-                f_t += float(ret[0])
-                vm_t += float(ret[1])
-                cm_t += float(ret[2])
-                cx_t += float(ret[3])
-                step_sim += float(ret[4])
-                max_t_coda += float(ret[5])
-                t_med_coda += float(ret[6])
-
-            else:
-                for y in range(0, prove_fissate_auto):
-
-                    n_port = n_porta_base + (x * step_auto_test) + y
-
-                    ret = BatchLib.run(n_port, n_auto, tempo_generazione, gui, max_auto_insieme)
-
-                    f_t += float(ret[0])
-                    vm_t += float(ret[1])
-                    cm_t += float(ret[2])
-                    cx_t += float(ret[3])
-                    step_sim += float(ret[4])
-                    max_t_coda += float(ret[5])
-                    t_med_coda += float(ret[6])
 
             f_t = round(float(f_t) / float(prove_fissate_auto), 4)
             vm_t = round(float(vm_t) / float(prove_fissate_auto), 4)
