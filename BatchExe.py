@@ -61,7 +61,7 @@ for x in range(from_auto_test, to_auto_test + 1):
         pool_arr = []
         for y in range(0, prove_fissate_auto):
             print("")
-            print("ESEGUO PROVA CON " + str(x) + " AUTO...")
+            print("\nESEGUO PROVA CON " + str(x) + " AUTO...\n")
 
             pool_arr.append(pool.apply_async(BatchLib.run,
                                              (n_port + x + y, n_auto, tempo_generazione, gui, celle_per_lato,
