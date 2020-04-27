@@ -190,8 +190,8 @@ def run(port_t, gui, celle_per_lato):
         ritorno2 = limiti_celle(stopXY(shape), celle_per_lato)
         limiti_celle_X.append(ritorno2[0])
         limiti_celle_Y.append(ritorno2[1])
-        print(limiti_celle_X)
-        print(limiti_celle_Y)
+        # print(limiti_celle_X)
+        # print(limiti_celle_Y)
 
     arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione
 
@@ -245,8 +245,8 @@ def run(port_t, gui, celle_per_lato):
         arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione
 
     # STAMPO LA MATRICE
-    for x in ret_lista_occupazione_celle:
-        print(x)
+    # for x in ret_lista_occupazione_celle:
+    #    print(x)
 
     traci.close()
     return ret_lista_occupazione_celle

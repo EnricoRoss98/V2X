@@ -15,7 +15,7 @@ t_coda = open("Output/t_in_coda.txt", "w")  # scrivo il tempo medio in coda risp
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
 from_auto_test = 10  # (per simulazione impostare a 10)
-to_auto_test = 150  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
+to_auto_test = 200  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 10  # (per simulazione impostare a 10)
 prove_fissate_auto = 10  # (per simulazione impostare a 10)
 max_auto_insieme = 12  # solo per Version4 e Versione7
@@ -56,31 +56,19 @@ for x in range(from_auto_test, to_auto_test + 1):
 
         n_auto = x
 
-        if prove_fissate_auto == 10:
-            n_port = n_porta_base
-            pool = Pool(processes=10)
-            p = pool.apply_async(BatchLib.run,
-                                 (n_port + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
-            p1 = pool.apply_async(BatchLib.run,
-                                  (n_port + 1 + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
-            p2 = pool.apply_async(BatchLib.run,
-                                  (n_port + 2 + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
-            p3 = pool.apply_async(BatchLib.run,
-                                  (n_port + 3 + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
-            p4 = pool.apply_async(BatchLib.run,
-                                  (n_port + 4 + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
-            p5 = pool.apply_async(BatchLib.run,
-                                  (n_port + 5 + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
-            p6 = pool.apply_async(BatchLib.run,
-                                  (n_port + 6 + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
-            p7 = pool.apply_async(BatchLib.run,
-                                  (n_port + 7 + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
-            p8 = pool.apply_async(BatchLib.run,
-                                  (n_port + 8 + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
-            p9 = pool.apply_async(BatchLib.run,
-                                  (n_port + 9 + x, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice))
+        n_port = n_porta_base
+        pool = Pool(processes=prove_fissate_auto)
+        pool_arr = []
+        for y in range(0, prove_fissate_auto):
+            print("")
+            print("ESEGUO PROVA CON " + str(x) + " AUTO...")
 
-            ret = p.get()
+            pool_arr.append(pool.apply_async(BatchLib.run,
+                                             (n_port + x + y, n_auto, tempo_generazione, gui, celle_per_lato,
+                                              traiettorie_matrice)))
+
+        for y in range(0, prove_fissate_auto):
+            ret = pool_arr[y].get()
             f_t += float(ret[0])
             vm_t += float(ret[1])
             cm_t += float(ret[2])
@@ -88,103 +76,6 @@ for x in range(from_auto_test, to_auto_test + 1):
             step_sim += float(ret[4])
             max_t_coda += float(ret[5])
             t_med_coda += float(ret[6])
-
-            ret = p1.get()
-            f_t += float(ret[0])
-            vm_t += float(ret[1])
-            cm_t += float(ret[2])
-            cx_t += float(ret[3])
-            step_sim += float(ret[4])
-            max_t_coda += float(ret[5])
-            t_med_coda += float(ret[6])
-
-            ret = p2.get()
-            f_t += float(ret[0])
-            vm_t += float(ret[1])
-            cm_t += float(ret[2])
-            cx_t += float(ret[3])
-            step_sim += float(ret[4])
-            max_t_coda += float(ret[5])
-            t_med_coda += float(ret[6])
-
-            ret = p3.get()
-            f_t += float(ret[0])
-            vm_t += float(ret[1])
-            cm_t += float(ret[2])
-            cx_t += float(ret[3])
-            step_sim += float(ret[4])
-            max_t_coda += float(ret[5])
-            t_med_coda += float(ret[6])
-
-            ret = p4.get()
-            f_t += float(ret[0])
-            vm_t += float(ret[1])
-            cm_t += float(ret[2])
-            cx_t += float(ret[3])
-            step_sim += float(ret[4])
-            max_t_coda += float(ret[5])
-            t_med_coda += float(ret[6])
-
-            ret = p5.get()
-            f_t += float(ret[0])
-            vm_t += float(ret[1])
-            cm_t += float(ret[2])
-            cx_t += float(ret[3])
-            step_sim += float(ret[4])
-            max_t_coda += float(ret[5])
-            t_med_coda += float(ret[6])
-
-            ret = p6.get()
-            f_t += float(ret[0])
-            vm_t += float(ret[1])
-            cm_t += float(ret[2])
-            cx_t += float(ret[3])
-            step_sim += float(ret[4])
-            max_t_coda += float(ret[5])
-            t_med_coda += float(ret[6])
-
-            ret = p7.get()
-            f_t += float(ret[0])
-            vm_t += float(ret[1])
-            cm_t += float(ret[2])
-            cx_t += float(ret[3])
-            step_sim += float(ret[4])
-            max_t_coda += float(ret[5])
-            t_med_coda += float(ret[6])
-
-            ret = p8.get()
-            f_t += float(ret[0])
-            vm_t += float(ret[1])
-            cm_t += float(ret[2])
-            cx_t += float(ret[3])
-            step_sim += float(ret[4])
-            max_t_coda += float(ret[5])
-            t_med_coda += float(ret[6])
-
-            ret = p9.get()
-            f_t += float(ret[0])
-            vm_t += float(ret[1])
-            cm_t += float(ret[2])
-            cx_t += float(ret[3])
-            step_sim += float(ret[4])
-            max_t_coda += float(ret[5])
-            t_med_coda += float(ret[6])
-
-        else:
-            for y in range(0, prove_fissate_auto):
-                print("")
-                print("ESEGUO PROVA " + str(y + 1) + " CON " + str(x) + " AUTO...")
-
-                n_port = n_porta_base + (x * step_auto_test) + y
-                ret = BatchLib.run(n_port, n_auto, tempo_generazione, gui, celle_per_lato, traiettorie_matrice)
-
-                f_t += float(ret[0])
-                vm_t += float(ret[1])
-                cm_t += float(ret[2])
-                cx_t += float(ret[3])
-                step_sim += float(ret[4])
-                max_t_coda += float(ret[5])
-                t_med_coda += float(ret[6])
 
         f_t = round(float(f_t) / float(prove_fissate_auto), 4)
         vm_t = round(float(vm_t) / float(prove_fissate_auto), 4)
