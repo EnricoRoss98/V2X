@@ -685,9 +685,9 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
             # print(traci.simulation.getTime())
             # print(passaggio[incrID])
             # print(passaggio_cella[incrID])
-            for x in matrice_incrocio[incrID]:  # matrice
-                print(x)
-            print("\n\n")
+            # for x in matrice_incrocio[incrID]:  # matrice
+            #     print(x)
+            # print("\n\n")
 
         if step % 4 == 0:  # ogni 2 step ne calcola output
             file_rit = output(arrayAuto, auto_in_simulazione)  # per generare stringhe di output
