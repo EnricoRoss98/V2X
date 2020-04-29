@@ -190,39 +190,16 @@ def isLibero(passaggio_temp, matrice_incrocio_temp, passaggio_cella_temp, limiti
 
                         if pos_attuale_X != y[1] or pos_attuale_Y != y[2]:  # se la pos della vettura nelle celle cambia
 
-                            # print("Posizione attuale diversa dalla precedente! -> " + str(y[1]) + " | " + str(y[2]))
-
-                            if y[1] is not None and y[2] is not None:
-                                # print("Imposto vecchia cella su cui era a False")
-
-                                # imposto la vecchia cella su cui era a False e anche sulle 8 caselle circostanti
-                                for index_y in range(-1, 2):
-                                    for index_x in range(-1, 2):
-                                        if ((y[2] + index_y) >= 0) and ((y[1] + index_x) >= 0) and \
-                                                ((y[2] + index_y) < len(matrice_incrocio_temp)) and \
-                                                ((y[1] + index_x) < len(matrice_incrocio_temp)):
-                                            matrice_incrocio_temp[y[2] + index_y][y[1] + index_x] = False
-
-                            # matrice_incrocio_temp[pos_attuale_X][pos_attuale_Y] = True  # e la nuova cella su True
-
                             # aggiorno poi il vettore con la nuova posizione della cella in cui si trova
                             passaggio_cella_nuovo[passaggio_cella_nuovo.index(y)] = [y[0], pos_attuale_X, pos_attuale_Y]
 
-                            y1 = [y[0], pos_attuale_X, pos_attuale_Y]
+                            # y1 = [y[0], pos_attuale_X, pos_attuale_Y]
                             # print("Aggiorno vettore: " + str(passaggio_cella_nuovo[passaggio_cella_nuovo.index(y1)]))
 
                     else:  # altrimenti se l'auto e' uscita dall'incrocio
                         if y[1] is not None and y[2] is not None:  # se None allora non e' ancora entrata e non la tolgo
                             passaggio_nuovo.pop(passaggio_nuovo.index(x))  # tolgo l'auto dal vettore
                             passaggio_cella_nuovo.pop(passaggio_cella_nuovo.index(y))  # tolgo l'auto dal vettore
-
-                            # imposto la vecchia cella su cui era a False e anche le 8 caselle circostanti
-                            for index_y in range(-1, 2):
-                                for index_x in range(-1, 2):
-                                    if ((y[2] + index_y) >= 0) and ((y[1] + index_x) >= 0) and \
-                                            ((y[2] + index_y) < len(matrice_incrocio_temp)) and \
-                                            ((y[1] + index_x) < len(matrice_incrocio_temp)):
-                                        matrice_incrocio_temp[y[2] + index_y][y[1] + index_x] = False
 
         else:  # se gira a destra vedo se cambia via e la tolgo dal vettore passaggio[]
             road = prossimaStrada(x)  # prossima via
@@ -519,11 +496,12 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
         for i in range(0, n_auto):
             tempo_coda[incrID].insert(i, [0, 0])
 
-        matrice_incrocio.append([])  # popolo la matrice_incrocio (di ogni incrocio rilevato) mettendo tutte celle False
+        matrice_incrocio.append([])  # popolo la matrice_incrocio (di ogni incrocio rilevato)
         for x in range(0, celle_per_lato):  # matrice
             matrice_incrocio[incrID].append([])
             for y in range(0, celle_per_lato):
-                matrice_incrocio[incrID][x].append(False)
+                # ogni cella e' un'array dei tempi stimati di occupazione della medesima
+                matrice_incrocio[incrID][x].append([])
 
     arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione
 
