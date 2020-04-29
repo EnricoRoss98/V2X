@@ -105,10 +105,10 @@ def t_arrivo_cella(auto_temp, metri_da_incrocio_temp, metri_da_cella_temp):  # r
     vf = traci.vehicle.getMaxSpeed(auto_temp)
     a = traci.vehicle.getAccel(auto_temp)
 
-    t = - (vi / a) + (math.sqrt((vi * vi) + (2 * (metri_da_cella_temp - metri_da_incrocio_temp))) / a) + \
-        (metri_da_cella_temp / vf) - (((((vf * vf) - (vi * vi)) / (2 * a)) + metri_da_incrocio_temp) / vf)
-    t_int = int(round(t, 0))
-    return t_int + traci.simulation.getTime()
+    t = - (vi / a) + (math.sqrt((vi * vi) + (2 * a * (metri_da_cella_temp - metri_da_incrocio_temp))) / a) + \
+        (metri_da_cella_temp / vf) - (((vf * vf) - (vi * vi)) / (2 * a * vf)) + (metri_da_incrocio_temp / vf)
+    t = round(t, 3)
+    return t + traci.simulation.getTime()
 
 
 def arrivoAuto(auto_temp, passaggio_temp, ferme_temp, attesa_temp, matrice_incrocio_temp, passaggio_cella_temp,
@@ -182,7 +182,7 @@ def get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matr
                             for t in matrice_incrocio_temp[celle[0] + index_y][celle[1] + index_x]:
                                 # controlla che il timestep di arrivo calcolato non cada in un range di sicurezza
                                 # dal valore selezionato
-                                if t+10 <= timestep <= t+10:
+                                if t-15 <= timestep <= t+15:
                                     libero = False
                                     break
 
@@ -665,9 +665,9 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
             # print(traci.simulation.getTime())
             # print(passaggio[incrID])
             # print(passaggio_cella[incrID])
-            # for x in matrice_incrocio[incrID]:  # matrice
-            #     print(x)
-            # print("\n\n")
+            for x in matrice_incrocio[incrID]:  # matrice
+                print(x)
+            print("\n\n")
 
         if step % 4 == 0:  # ogni 2 step ne calcola output
             file_rit = output(arrayAuto, auto_in_simulazione)  # per generare stringhe di output
