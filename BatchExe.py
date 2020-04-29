@@ -21,8 +21,8 @@ prove_fissate_auto = 1  # (per simulazione impostare a 10)
 gui = True
 n_porta_base = 5000
 prove_una_auto = 1  # (per simulazione impostare a 20)
-celle_per_lato = 10  # per protocolli basati sulla suddivisione matriciale dell'incrocio
-secondi_di_sicurezza = 15
+celle_per_lato = 22  # per protocolli basati sulla suddivisione matriciale dell'incrocio
+secondi_di_sicurezza = 12
 
 # ---------------------------------------------------------------- #
 #
