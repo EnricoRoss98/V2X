@@ -14,15 +14,15 @@ t_coda = open("Output/t_in_coda.txt", "w")  # scrivo il tempo medio in coda risp
 #
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
-from_auto_test = 80  # (per simulazione impostare a 10)
-to_auto_test = 80  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
+from_auto_test = 50  # (per simulazione impostare a 10)
+to_auto_test = 50  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 1  # (per simulazione impostare a 10)
 prove_fissate_auto = 1  # (per simulazione impostare a 10)
-max_auto_insieme = 12  # solo per Version4 e Versione7
 gui = True
 n_porta_base = 5000
 prove_una_auto = 1  # (per simulazione impostare a 20)
 celle_per_lato = 22  # per protocolli basati sulla suddivisione matriciale dell'incrocio
+secondi_di_sicurezza = 15
 
 # ---------------------------------------------------------------- #
 #
@@ -37,7 +37,7 @@ traiettorie_matrice = Traiettorie.run(n_porta_base, False, celle_per_lato)
 # eseguo prove per rilevare tempo in condizione standard, con una sola auto
 for y in range(0, prove_una_auto):
     n_port = n_porta_base + y + 1
-    ret = BatchLib.run(n_port, 1, tempo_generazione, False, celle_per_lato, traiettorie_matrice)
+    ret = BatchLib.run(n_port, 1, tempo_generazione, False, celle_per_lato, traiettorie_matrice, secondi_di_sicurezza)
     step_sim += float(ret[4])
 
 step_sim = round(float(step_sim) / float(prove_una_auto), 4)
@@ -65,7 +65,7 @@ for x in range(from_auto_test, to_auto_test + 1):
 
             pool_arr.append(pool.apply_async(BatchLib.run,
                                              (n_port + x + y, n_auto, tempo_generazione, gui, celle_per_lato,
-                                              traiettorie_matrice)))
+                                              traiettorie_matrice, secondi_di_sicurezza)))
 
         for y in range(0, prove_fissate_auto):
             ret = pool_arr[y].get()

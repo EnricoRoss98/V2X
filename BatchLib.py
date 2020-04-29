@@ -112,10 +112,11 @@ def t_arrivo_cella(auto_temp, metri_da_incrocio_temp, metri_da_cella_temp):  # r
 
 
 def arrivoAuto(auto_temp, passaggio_temp, ferme_temp, attesa_temp, matrice_incrocio_temp, passaggio_cella_temp,
-               traiettorie_matrice_temp, estremi_incrocio):
+               traiettorie_matrice_temp, estremi_incrocio, sec_sicurezza):
     # gest. arrivo auto in prossimita' dello stop
 
-    if not get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matrice_temp, estremi_incrocio):
+    if not get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matrice_temp, estremi_incrocio,
+                                     sec_sicurezza):
         ferme_temp.append(auto_temp)
         traci.vehicle.setSpeed(auto_temp, 0.0)  # faccio fermare l'auto
     else:
@@ -159,7 +160,8 @@ def set_in_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matric
     return matrice_incrocio_temp
 
 
-def get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matrice_temp, estermi_incrocio):
+def get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matrice_temp, estermi_incrocio,
+                              sec_sicurezza):
     # data auto e matrice_incrocio restituisce variabile booleana a True se non sono state rilevate collisioni
     # dall'attuale situazione di passaggio rilevata all'interno della matrice, False se rilevate collisioni
 
@@ -182,7 +184,7 @@ def get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matr
                             for t in matrice_incrocio_temp[celle[0] + index_y][celle[1] + index_x]:
                                 # controlla che il timestep di arrivo calcolato non cada in un range di sicurezza
                                 # dal valore selezionato
-                                if t-15 <= timestep <= t+15:
+                                if t-sec_sicurezza <= timestep <= t+sec_sicurezza:
                                     libero = False
                                     break
 
@@ -424,7 +426,25 @@ def generaVeicoli(n_auto_t, t_gen):
         traci.vehicle.setDecel(id_veh, 0.0078125)
 
 
-def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice):
+def pulisci_matrice(matrice_incrocio_temp, sec_sicurezza_temp):
+    matrice_incrocio = []
+    for incr in matrice_incrocio_temp:
+        index_incr = matrice_incrocio_temp.index(incr)
+        matrice_incrocio.append(incr)
+        for y in matrice_incrocio_temp[index_incr]:
+            index_y = matrice_incrocio_temp[index_incr].index(y)
+            for x in matrice_incrocio_temp[index_incr][index_y]:
+                index_x = matrice_incrocio_temp[index_incr][index_y].index(x)
+                for val in matrice_incrocio_temp[index_incr][index_y][index_x]:
+                    # print(val)
+                    index_val = matrice_incrocio_temp[index_incr][index_y][index_x].index(val)
+                    if val < (traci.simulation.getTime() - sec_sicurezza_temp - 10):
+                        matrice_incrocio[index_incr][index_y][index_x].pop(index_val)
+
+    return matrice_incrocio
+
+
+def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice, sec_sicurezza):
     # -------- import python modules from the $SUMO_HOME/tools directory --------
 
     try:
@@ -576,7 +596,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
                                 if traci.vehicle.getSpeed(auto) == 1:
                                     rientro4 = arrivoAuto(auto, passaggio[incrID], ferme[incrID], attesa[incrID],
                                                           matrice_incrocio[incrID], passaggio_cella[incrID],
-                                                          traiettorie_matrice, stop[incrID])
+                                                          traiettorie_matrice, stop[incrID], sec_sicurezza)
                                     passaggio[incrID] = rientro4[0]
                                     attesa[incrID] = rientro4[1]
                                     ferme[incrID] = rientro4[2]
@@ -608,7 +628,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
                                     if dist_to_stop + 2 >= dist_stop:
                                         rientro4 = arrivoAuto(auto, passaggio[incrID], ferme[incrID], attesa[incrID],
                                                               matrice_incrocio[incrID], passaggio_cella[incrID],
-                                                              traiettorie_matrice, stop[incrID])
+                                                              traiettorie_matrice, stop[incrID], sec_sicurezza)
                                         passaggio[incrID] = rientro4[0]
                                         attesa[incrID] = rientro4[1]
                                         ferme[incrID] = rientro4[2]
@@ -645,7 +665,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
                         for auto_ferma in ferme[incrID]:
                             if auto_ferma in ferme[incrID]:
                                 if get_from_matrice_incrocio(auto_ferma, matrice_incrocio[incrID], traiettorie_matrice,
-                                                             stop[incrID]):
+                                                             stop[incrID], sec_sicurezza):
                                     # print("Faccio passare la " + str(auto_ferma))
                                     # vedo se percorso e' libero, e se si allora la faccio partire
                                     rientro4 = avantiAuto(auto_ferma, passaggio[incrID], attesa[incrID], ferme[incrID],
@@ -675,6 +695,9 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice)
             vm_s.append(file_rit[1])
             cm_s.append(file_rit[2])
             cx_s.append(file_rit[3])
+
+        if step % 10 == 0:  # ogni 10 step pulisco la matrice da valori troppo vecchi
+            matrice_incrocio = pulisci_matrice(matrice_incrocio, sec_sicurezza)
 
         coloreAuto(arrayAuto, junctIDList, attesa, ferme)  # assegna colori alle auto
 
