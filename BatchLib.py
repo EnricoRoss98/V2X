@@ -147,15 +147,16 @@ def set_in_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matric
             for celle in route[1]:
                 # calcolo timestep di arrivo su tale cella
                 timestep = t_arrivo_cella(auto_temp, metri_da_incrocio(auto_temp, estermi_incrocio), celle[2])
-
-                # scrivo sulla casella centrale e anche sulle 8 caselle circostanti
-                for index_y in range(-1, 2):
-                    for index_x in range(-1, 2):
-                        if ((celle[0] + index_y) >= 0) and ((celle[1] + index_x) >= 0) and \
-                                ((celle[0] + index_y) < len(matrice_incrocio_temp)) and \
-                                ((celle[1] + index_x) < len(matrice_incrocio_temp)):
-                            # print(str(celle[0] + index_y) + " | " + str(celle[1] + index_x))
-                            matrice_incrocio_temp[celle[0] + index_y][celle[1] + index_x].append(timestep)
+                celle_occupate = celle_occupate_data_ang(celle[3])
+                # controllo le celle occupate dall'auto
+                for celle_circostanti in celle_occupate:
+                    index_y = celle_circostanti[0]
+                    index_x = celle_circostanti[1]
+                    if ((celle[0] + index_y) >= 0) and ((celle[1] + index_x) >= 0) and \
+                            ((celle[0] + index_y) < len(matrice_incrocio_temp)) and \
+                            ((celle[1] + index_x) < len(matrice_incrocio_temp)):
+                        # print(str(celle[0] + index_y) + " | " + str(celle[1] + index_x))
+                        matrice_incrocio_temp[celle[0] + index_y][celle[1] + index_x].append(timestep)
 
     return matrice_incrocio_temp
 
@@ -173,20 +174,21 @@ def get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matr
         if route[0] == rotta and libero:
             for celle in route[1]:
                 timestep = t_arrivo_cella(auto_temp, metri_da_incrocio(auto_temp, estermi_incrocio), celle[2])
-
-                # controllo la cella centrale e controllo anche le 8 caselle circostanti
-                for index_y in range(-1, 2):
-                    for index_x in range(-1, 2):
-                        if ((celle[0] + index_y) >= 0) and ((celle[1] + index_x) >= 0) and \
-                                ((celle[0] + index_y) < len(matrice_incrocio_temp)) and \
-                                ((celle[1] + index_x) < len(matrice_incrocio_temp)):
-                            # scorre i tempi di occupazione segnati all'interno della cella
-                            for t in matrice_incrocio_temp[celle[0] + index_y][celle[1] + index_x]:
-                                # controlla che il timestep di arrivo calcolato non cada in un range di sicurezza
-                                # dal valore selezionato
-                                if t-sec_sicurezza <= timestep <= t+sec_sicurezza:
-                                    libero = False
-                                    break
+                celle_occupate = celle_occupate_data_ang(celle[3])
+                # controllo le celle occupate dall'auto
+                for celle_circostanti in celle_occupate:
+                    index_y = celle_circostanti[0]
+                    index_x = celle_circostanti[1]
+                    if ((celle[0] + index_y) >= 0) and ((celle[1] + index_x) >= 0) and \
+                            ((celle[0] + index_y) < len(matrice_incrocio_temp)) and \
+                            ((celle[1] + index_x) < len(matrice_incrocio_temp)):
+                        # scorre i tempi di occupazione segnati all'interno della cella
+                        for t in matrice_incrocio_temp[celle[0] + index_y][celle[1] + index_x]:
+                            # controlla che il timestep di arrivo calcolato non cada in un range di sicurezza
+                            # dal valore selezionato
+                            if t-sec_sicurezza <= timestep <= t+sec_sicurezza:
+                                libero = False
+                                break
 
     return libero
 
