@@ -158,7 +158,8 @@ def run(port_t, gui, celle_per_lato):
 
     time_entrata_in_incrocio = []  # time step in cui auto di determinata route entra nell'incrocio
     ret_lista_occupazione_celle = []  # [["routeX", [ [Y1, X1, metri], [Y2, X2, metri], ...] ], ["routeY", [...]], ...]
-    metri_to_cella = []  # tutti i metri calcolati quando auto sulla stessa cella
+    metri_to_cella = []  # tutti i metri calcolati quando l'auto e' campionata sulla stessa cella
+    ang_in_cella = []  # angoli rilevati quando l'auto e' campionata sulla stessa cella
 
     # -------- trovo lista degli incroci --------
 
@@ -244,29 +245,40 @@ def run(port_t, gui, celle_per_lato):
                     # CALCOLO METRI (tempo X velocita' auto)
                     metri = float(time_diff) * 0.5
 
+                    # RILEVO angolo
+                    ang = traci.vehicle.getAngle(auto)
+
                     # se auto e' gia' passata in quella cella
                     trovato = -1
                     m_metri = 0
+                    m_ang = 0
                     for x in ret_lista_occupazione_celle[index][1]:
                         if x[0] == pos_attuale_Y and x[1] == pos_attuale_X:
                             trovato = ret_lista_occupazione_celle[index][1].index(x)
                             # print(str(ret_lista_occupazione_celle[index][0]) + " gia' passata!")
                             metri_to_cella.append(metri)
+                            ang_in_cella.append(ang)
                             # print(metri_to_cella)
                         if trovato > -1:
                             break
                     if trovato > -1:
                         for x in metri_to_cella:
                             m_metri += x
+                        for x in ang_in_cella:
+                            m_ang += x
                         m_metri = float(m_metri) / float(len(metri_to_cella))
+                        m_ang = float(m_ang) / float(len(ang_in_cella))
                         # print(m_metri)
                         ret_lista_occupazione_celle[index][1][trovato][2] = m_metri
+                        ret_lista_occupazione_celle[index][1][trovato][3] = round(m_ang, 3)
 
                     else:  # se non c'e' mai passata
                         metri_to_cella = [metri]
+                        ang_in_cella = [round(ang, 3)]
                         # print(str(ret_lista_occupazione_celle[index][0]) + " mai passata!")
                         # print("Pulisco array!")
-                        ret_lista_occupazione_celle[index][1].append([pos_attuale_Y, pos_attuale_X, metri])
+                        ret_lista_occupazione_celle[index][1].append([pos_attuale_Y, pos_attuale_X, metri,
+                                                                      round(ang, 3)])
                         # print("\n")
                         # print(route)
                         # print("Posizione attuale: " + str(pos_attuale_X) + " | " + str(pos_attuale_Y))
@@ -280,8 +292,8 @@ def run(port_t, gui, celle_per_lato):
     # for x in time_entrata_in_incrocio:
     #     print(x)
     # print("\n\n")
-    # for x in ret_lista_occupazione_celle:
-    #     print(x)
+    for x in ret_lista_occupazione_celle:
+        print(x)
 
     traci.close()
     return ret_lista_occupazione_celle
