@@ -292,8 +292,8 @@ def run(port_t, gui, celle_per_lato):
     # for x in time_entrata_in_incrocio:
     #     print(x)
     # print("\n\n")
-    for x in ret_lista_occupazione_celle:
-        print(x)
+    # for x in ret_lista_occupazione_celle:
+    #     print(x)
 
     traci.close()
     return ret_lista_occupazione_celle
