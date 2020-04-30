@@ -14,15 +14,15 @@ t_coda = open("Output/t_in_coda.txt", "w")  # scrivo il tempo medio in coda risp
 #
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
-from_auto_test = 100  # (per simulazione impostare a 10)
-to_auto_test = 100  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
-step_auto_test = 1  # (per simulazione impostare a 10)
-prove_fissate_auto = 1  # (per simulazione impostare a 10)
-gui = True
+from_auto_test = 10  # (per simulazione impostare a 10)
+to_auto_test = 200  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
+step_auto_test = 10  # (per simulazione impostare a 10)
+prove_fissate_auto = 10  # (per simulazione impostare a 10)
+gui = False
 n_porta_base = 5000
-prove_una_auto = 1  # (per simulazione impostare a 20)
+prove_una_auto = 20  # (per simulazione impostare a 20)
 celle_per_lato = 22  # per protocolli basati sulla suddivisione matriciale dell'incrocio
-secondi_di_sicurezza = 12
+secondi_di_sicurezza = 13
 
 # ---------------------------------------------------------------- #
 #
