@@ -41,7 +41,7 @@
 -->
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <vType id="Car" maxSpeed="1.00" vClass="passenger" accel="0.03125" decel="0.03125"/>
+    <vType id="Car" maxSpeed="1.00" vClass="passenger" accel="0.03125" decel="0.03125" lcKeepRight="0.0"/>
     <route edges="sotto-to-centr centr-to-sinis" color="green" id="route_0"/>
     <route edges="sotto-to-centr centr-to-sopra" color="green" id="route_1"/>
     <route edges="sotto-to-centr centr-to-destr" color="green" id="route_2"/>
