@@ -111,6 +111,11 @@ def t_arrivo_cella(auto_temp, metri_da_incrocio_temp, metri_da_cella_temp):  # r
     return t + traci.simulation.getTime()
 
 
+def celle_occupate_data_ang(ang):  # restituisce le celle occupate data angolazione del veicolo, centrate in [0][0]
+    celle_occupate = []
+    return celle_occupate
+
+
 def arrivoAuto(auto_temp, passaggio_temp, ferme_temp, attesa_temp, matrice_incrocio_temp, passaggio_cella_temp,
                traiettorie_matrice_temp, estremi_incrocio, sec_sicurezza):
     # gest. arrivo auto in prossimita' dello stop
