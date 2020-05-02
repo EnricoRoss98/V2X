@@ -28,7 +28,7 @@ secondi_di_sicurezza = 13
 #
 #
 
-tempo_generazione = 600  # fissato
+tempo_generazione = 600 * 2  # fissato
 step0 = 0
 step_sim = 0
 
