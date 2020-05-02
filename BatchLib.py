@@ -116,7 +116,7 @@ def celle_occupate_data_ang(ang):  # restituisce le celle occupate data angolazi
     ang = ang % 180
     ang = - ang
     x_auto = 2.5
-    y_auto = 5
+    y_auto = x_auto * 2.5
     ang = math.radians(ang)  # converto in radianti
     a1 = [- float(x_auto) / float(2), float(y_auto) / float(2)]
     a2 = [float(x_auto) / float(2), float(y_auto) / float(2)]
