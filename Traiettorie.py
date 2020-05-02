@@ -106,7 +106,7 @@ def generaVeicoli():
 
             route = "route_" + str(r_route)
             id_veh = "veh_" + str(i)
-            traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "0.5")
+            traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "0.25")
 
 
 def run(port_t, gui, celle_per_lato):

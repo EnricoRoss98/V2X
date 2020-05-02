@@ -116,7 +116,7 @@ def celle_occupate_data_ang(ang):  # restituisce le celle occupate data angolazi
     ang = ang % 180
     ang = - ang
     x_auto = 2.5
-    y_auto = 5
+    y_auto = x_auto * 2.5
     ang = math.radians(ang)  # converto in radianti
     a1 = [- float(x_auto) / float(2), float(y_auto) / float(2)]
     a2 = [float(x_auto) / float(2), float(y_auto) / float(2)]
@@ -502,10 +502,10 @@ def generaVeicoli(n_auto_t, t_gen):
         id_veh = "veh_" + str(i)
 
         # 4 istruzioni sotto permettono di cambiare velocita' massima e accelerazione/decelerazione per la simulazione
-        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "0.5")
-        traci.vehicle.setMaxSpeed(id_veh, 0.5)
-        traci.vehicle.setAccel(id_veh, 0.0078125)
-        traci.vehicle.setDecel(id_veh, 0.0078125)
+        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "0.25")
+        traci.vehicle.setMaxSpeed(id_veh, 0.25)
+        traci.vehicle.setAccel(id_veh, 0.001953125)
+        traci.vehicle.setDecel(id_veh, 0.001953125)
 
 
 def pulisci_matrice(matrice_incrocio_temp, sec_sicurezza_temp):
@@ -760,7 +760,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
                                     matrice_incrocio[incrID] = rientro4[3]
                                     passaggio_cella[incrID] = rientro4[4]
 
-            if step % 2 == 0:
+            if step % 4 == 0:
                 tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
             # STAMPO LA MATRICE
@@ -771,14 +771,14 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
             #     print(x)
             # print("\n\n")
 
-        if step % 4 == 0:  # ogni 2 step ne calcola output
+        if step % 8 == 0:  # calcola output
             file_rit = output(arrayAuto, auto_in_simulazione)  # per generare stringhe di output
             f_s.append(file_rit[0])
             vm_s.append(file_rit[1])
             cm_s.append(file_rit[2])
             cx_s.append(file_rit[3])
 
-        if step % 10 == 0:  # ogni 10 step pulisco la matrice da valori troppo vecchi
+        if step % 20 == 0:  # ogni 10 step pulisco la matrice da valori troppo vecchi
             matrice_incrocio = pulisci_matrice(matrice_incrocio, sec_sicurezza)
 
         coloreAuto(arrayAuto, junctIDList, attesa, ferme)  # assegna colori alle auto
