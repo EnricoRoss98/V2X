@@ -72,7 +72,7 @@ for x in range(from_auto_test, to_auto_test + 1):
         for y in range(0, prove_fissate_auto):
             ret = pool_arr[y].get()
             f_t += float(ret[0])
-            vm_t += float(ret[1])
+            vm_t += float(float(ret[1])/float(0.25))
             cm_t += float(ret[2])
             cx_t += float(ret[3])
             step_sim += float(ret[4])
