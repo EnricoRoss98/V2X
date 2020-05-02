@@ -28,7 +28,7 @@ celle_per_lato = 22  # per protocolli basati sulla suddivisione matriciale dell'
 #
 #
 
-tempo_generazione = 600  # fissato
+tempo_generazione = 600 * 2  # fissato
 step0 = 0
 step_sim = 0
 
