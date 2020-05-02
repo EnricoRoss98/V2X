@@ -24,6 +24,8 @@ prove_una_auto = 1  # (per simulazione impostare a 20)
 celle_per_lato = 20  # per protocolli basati sulla suddivisione matriciale dell'incrocio
 secondi_di_sicurezza = 2
 
+# per celle_lato = 20, sec_di_sicurezza = 2
+
 # ---------------------------------------------------------------- #
 #
 #

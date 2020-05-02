@@ -111,11 +111,13 @@ def t_arrivo_cella(auto_temp, metri_da_incrocio_temp, metri_da_cella_temp):  # r
     return t + traci.simulation.getTime()
 
 
-def celle_occupate_data_ang(ang):  # restituisce le celle occupate data angolazione del veicolo, centrate in [0][0]
+def celle_occupate_data_ang(ang, celle_lato):
+    # restituisce le celle occupate data angolazione del veicolo, centrate in [0][0]
+
     celle_occupate = []
     ang = ang % 180
     ang = - ang
-    x_auto = 2.5
+    x_auto = (2.5 * celle_lato) / 20
     y_auto = x_auto * 2.5
     ang = math.radians(ang)  # converto in radianti
     a1 = [- float(x_auto) / float(2), float(y_auto) / float(2)]
@@ -227,7 +229,8 @@ def set_in_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matric
             for celle in route[1]:
                 # calcolo timestep di arrivo su tale cella
                 timestep = t_arrivo_cella(auto_temp, metri_da_incrocio(auto_temp, estermi_incrocio), celle[2])
-                celle_occupate = celle_occupate_data_ang(celle[3])
+
+                celle_occupate = celle_occupate_data_ang(celle[3], len(matrice_incrocio_temp))
                 # controllo le celle occupate dall'auto
                 for celle_circostanti in celle_occupate:
                     index_y = celle_circostanti[0]
@@ -254,7 +257,7 @@ def get_from_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matr
         if route[0] == rotta and libero:
             for celle in route[1]:
                 timestep = t_arrivo_cella(auto_temp, metri_da_incrocio(auto_temp, estermi_incrocio), celle[2])
-                celle_occupate = celle_occupate_data_ang(celle[3])
+                celle_occupate = celle_occupate_data_ang(celle[3], len(matrice_incrocio_temp))
                 # controllo le celle occupate dall'auto
                 for celle_circostanti in celle_occupate:
                     index_y = celle_circostanti[0]
