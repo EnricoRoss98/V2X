@@ -29,11 +29,31 @@ def stopXY(shape_temp):  # calcolo esrtremi dell'incrocio, dove sono presenti gl
     return stop_temp
 
 
-def costruzioneArray(arrayAuto_temp):  # costruzione dell'array composto dal nome delle auto presenti nella sim.
+def isLibero(occupato_temp, passaggio_temp):  # controllo se l'incrocio si e' liberato
+    road = prossimaStrada(passaggio_temp)  # prossima via
+    # print("In isLibero passaggio_temp[1] = " + passaggio_temp[1] + " e road = " + road)
+    if traci.vehicle.getRoadID(passaggio_temp[0]) == road:  # se l'auto cambia via considero l'incrocio libero
+        occupato_temp = False
+        # print("In isLibero: LIBERO!")
+    return occupato_temp
+
+
+def prossimaStrada(passaggio_temp):  # ottengo il nome della via a cui l'auto e' diretta
+    route = traci.vehicle.getRoute(passaggio_temp[0])  # ottengo rotta dell'auto che sta attraversando
+    att_road = passaggio_temp[1]  # strada attuale
+    pross_roadID = route.index(att_road) + 1  # posizione nel vettore attuale via + 1 = prossima
+    pross_road = route[pross_roadID]  # prossima strada
+
+    return pross_road
+
+
+def costruzioneArray(arrayAuto_temp):
+    # costruzione dell'array composto dal nome delle auto presenti nella sim.
     loadedIDList = traci.simulation.getDepartedIDList()  # carica nell'array le auto partite
     for id_auto in loadedIDList:
         if id_auto not in arrayAuto_temp:
             arrayAuto_temp.append(id_auto)
+
             # print("AUTO INSERT " + id_auto)
 
     arrivedIDList = traci.simulation.getArrivedIDList()  # elimina nell'array le auto arrivate
@@ -199,7 +219,6 @@ def run(port_t, n_auto, t_generazione, gui):
     # istanzio le matrici [nome_incrocio, variabile]
     attesa = []  # ordine di arrivo su lista, si pulisce quando liberano incrocio
     lista_arrivo = []  # auto entrate nelle vicinanze dell'incrocio, non si pulisce
-    passaggio = []  # auto che sta passando [auto, strada]
     lista_uscita = []  # auto uscite dall'incrocio, non si pulisce
     occupato = []  # incrocio e' occupato?
     ferme = []  # lista di auto ferme allo stop
@@ -207,8 +226,7 @@ def run(port_t, n_auto, t_generazione, gui):
     centerJunctID = []  # coordinate (x,y) del centro di un incrocio
     arrayAuto = []  # contiene lista di auto presenti nella simulazione
     tempo_coda = []
-
-    rientro4 = [occupato, passaggio, attesa, ferme]
+    strade = []
 
     f_s = []
     vm_s = []
@@ -237,7 +255,6 @@ def run(port_t, n_auto, t_generazione, gui):
         incrID = junctIDList.index(incrNome)  # popolo vettori e matrici inserendo le righe
         attesa.append([])
         lista_arrivo.append([])
-        passaggio.append(["", ""])
         lista_uscita.append([])
         occupato.append(False)
         ferme.append([])
@@ -251,12 +268,46 @@ def run(port_t, n_auto, t_generazione, gui):
         for i in range(0, n_auto):
             tempo_coda[incrID].insert(i, [0, 0])
 
-    arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione
+    arrayAuto = costruzioneArray(arrayAuto)
 
     while traci.simulation.getMinExpectedNumber() > 0:  # fino a quando tt le auto da inserire hanno terminato la corsa
 
         for incrNome in junctIDList:  # scorro lista incroci
             incrID = junctIDList.index(incrNome)
+
+            for auto in arrayAuto:
+
+                auto_in_lista = True
+                try:  # vedo se auto e' in lista tra le auto segnate per attraversare l'incrocio
+                    presente = int(lista_arrivo[incrID].index(auto))
+                except ValueError:
+                    auto_in_lista = False
+
+                pos = traci.vehicle.getPosition(auto)
+
+                if not auto_in_lista:  # se non in lista allora vedi se sta entrando nelle vicinanze dell'incrocio
+                    centerJunctID_temp = centerJunctID[incrID]
+
+                    if ((centerJunctID_temp[0] - 50 <= pos[0] <= centerJunctID_temp[0] + 50)
+                            and (centerJunctID_temp[1] - 50 <= pos[1] <= centerJunctID_temp[1] + 50)):
+                        # print(auto + " vicino a " + incrNome)
+                        lista_arrivo[incrID].append(auto)  # inserisco nella lista d'arrivo di quell'incrocio
+                        attesa[incrID].append(auto)  # e inserisco nella lista d'attesa di quell'incrocio
+                        strade.append([auto, traci.vehicle.getRoadID(auto)])
+
+                index_a = -1
+                for auto_strade in strade:
+                    if auto_strade[0] == auto:
+                        index_a = strade.index(auto_strade)
+
+                if index_a >= 0:
+                    route = traci.vehicle.getRoute(auto)  # ottengo rotta dell'auto che sta attraversando
+                    att_road = strade[index_a][1]  # strada attuale
+                    pross_roadID = route.index(att_road) + 1  # posizione nel vettore attuale via + 1 = prossima
+                    pross_road = route[pross_roadID]  # prossima strada
+                    if traci.vehicle.getRoadID(auto) == pross_road:
+                        attesa[incrID].pop(attesa[incrID].index(auto))
+                        strade.pop(index_a)
 
             tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
@@ -270,7 +321,6 @@ def run(port_t, n_auto, t_generazione, gui):
         traci.simulationStep(step)  # faccio avanzare la simulazione
 
         arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione
-
     #
     # ---------- genero output e lo rimando indietro ----------
     t_med_coda = 0.0
@@ -296,6 +346,7 @@ def run(port_t, n_auto, t_generazione, gui):
     for incr in range(0, len(tempo_coda)):
         for auto in range(0, len(tempo_coda[incr])):
             t_in_coda = tempo_coda[incr][auto][1] - tempo_coda[incr][auto][0]
+            # print(t_in_coda)
             if t_in_coda > max_t_coda:
                 max_t_coda = t_in_coda
             diff_t_med_coda_incr += t_in_coda
