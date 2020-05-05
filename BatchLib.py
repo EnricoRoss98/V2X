@@ -383,7 +383,7 @@ def output(arrayAuto_temp, auto_in_simulazione_t):  # scrivo nei file di output 
         cmax = 0.0
         cmed = 0.0
 
-    return ferme_perc, vmed, cmax, cmed
+    return ferme_perc, vmed, cmed, cmax
 
 
 def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
