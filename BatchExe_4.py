@@ -14,10 +14,10 @@ def main(max_auto_insieme):
     #
     # -------------------- VARIABILI MODIFICABILI -------------------- #
 
-    from_auto_test = 80  # (per simulazione impostare a 10)
+    from_auto_test = 50  # (per simulazione impostare a 10)
     to_auto_test = 200  # (per simulazione impostare a 100)
-    step_auto_test = 20  # (per simulazione impostare a 10)
-    prove_fissate_auto = 6  # (per simulazione impostare a 10)
+    step_auto_test = 50  # (per simulazione impostare a 10)
+    prove_fissate_auto = 20  # (per simulazione impostare a 10)
     gui = False
     n_porta_base = 5000
     prove_una_auto = 20  # (per simulazione impostare a 20)
@@ -121,10 +121,10 @@ def main(max_auto_insieme):
                 str(x) + " " + string_vett1[0] + "," + string_vett1[1] + " " + string_vett2[0] + "," + string_vett2[
                     1] + "\n")
 
-        t.close()
-        f.close()
-        cm.close()
-        vm.close()
-        t_coda.close()
-        print("\n\n\n\n\n\n\n")
-        print("FINE")
+    t.close()
+    f.close()
+    cm.close()
+    vm.close()
+    t_coda.close()
+    print("\n\n\n\n\n\n\n")
+    print("FINE")
