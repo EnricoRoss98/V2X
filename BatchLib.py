@@ -325,34 +325,32 @@ def output(arrayAuto_temp, auto_in_simulazione_t):  # scrivo nei file di output 
     code = []
 
     for viaID in traci.edge.getIDList():  # scorro vie
-        # coda per ogni angolo di percorrenza della via
-        coda0 = 0
-        coda90 = 0
-        coda180 = 0
-        coda270 = 0
-        for auto_temp in arrayAuto_temp:  # scorro auto nella simulazione
-            if traci.vehicle.getRoadID(auto_temp) == viaID:  # vedo se auto e' su quella via
-                # print(auto_temp+" "+str(round(traci.vehicle.getSpeed(auto_temp), 3)))
-                if round(traci.vehicle.getSpeed(auto_temp), 3) == 0:  # se ferma contr. ang e +1 uno alla relativa coda
-                    ang = traci.vehicle.getAngle(auto_temp)
-                    if ang == 0:
-                        coda0 += 1
-                    if ang == 90:
-                        coda90 += 1
-                    if ang == 180:
-                        coda180 += 1
-                    if ang == 270:
-                        coda270 += 1
+        if not viaID.startswith(":"):
+            # coda per ogni corsia nella via
+            coda0 = 0
+            coda1 = 0
+            coda2 = 0
+            for auto_temp in arrayAuto_temp:  # scorro auto nella simulazione
+                if traci.vehicle.getRoadID(auto_temp) == viaID:  # vedo se auto e' su quella via
+                    # print(auto_temp+" "+str(round(traci.vehicle.getSpeed(auto_temp), 3)))
+                    if round(traci.vehicle.getSpeed(auto_temp), 3) == 0:  # se V==0 contr corsia e +1 alla relativa coda
+                        corsia = traci.vehicle.getLaneIndex(auto_temp)
+                        if corsia == 0:
+                            coda0 += 1
+                        if corsia == 1:
+                            coda1 += 1
+                        if corsia == 2:
+                            coda2 += 1
+                        # print(auto_temp + " ferma in " + viaID + " corsia " + str(corsia))
 
-        # se ci sono auto nella coda di quell'angolo inserisci nel vettore code
-        if coda0 > 0:
-            code.append(coda0)
-        if coda90 > 0:
-            code.append(coda90)
-        if coda180 > 0:
-            code.append(coda180)
-        if coda270 > 0:
-            code.append(coda270)
+            # se ci sono auto nella coda di quella corsia inserisci nel vettore code
+            if coda0 > 0:
+                code.append(coda0)
+            if coda1 > 0:
+                code.append(coda1)
+            if coda2 > 0:
+                code.append(coda2)
+            # print(code)
 
     codesum = 0
     for count in range(0, len(code)):
