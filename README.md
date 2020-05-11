@@ -1,4 +1,4 @@
-# Versione 1.5
+# Versione 1.4b
 
 La Versione 1.5 segue le orme della Versione 1.3, ma per evitare i problemi introdotti dalla suddetta versione si segue 
 un approccio simile alla Versione 1.4 ma senza il contatore, nella Versione 1.5 si utilizza un contatore che tiene conto
