@@ -1,6 +1,6 @@
-# Versione 1.6
+# Versione 1.5
 
-Nella Versione 1.6 è stato migliorato l’algoritmo della Versione 1.5 permettendo il passaggio senza attese e 
+Nella Versione 1.5 è stato migliorato l’algoritmo della Versione 1.4b permettendo il passaggio senza attese e 
 rallentamenti per tutti quei veicoli sulla corsia più a destra, che quindi dovranno svoltare esclusivamente a destra, 
 poiché essi non intralciano il cammino di alcuna delle altre rotte. Esse non vanno a incrementare il contatore dei 
 passaggi né influiscono sulla variabile “semaforo” occupato, il sistema effettuerà le proprie valutazioni sul permesso 
