@@ -1,6 +1,6 @@
-# Versione 1.7
+# Versione 1.6
 
-La Versione 1.7 è semplicemente una Versione 1.6 con l’aggiunta del “max_auto_insieme” (ripreso dalla Versione 1.4) per 
+La Versione 1.6 è semplicemente una Versione 1.5 con l’aggiunta del “max_auto_insieme” (ripreso dalla Versione 1.4) per 
 permettere a tutti di superare l’intersezione in un tempo d’attesa minore, a discapito però del tempo totale di 
 simulazione dovuto dal costante rallentamento, attesa che tutti siano passati e successiva accelerazione dei veicoli 
 con nuova configurazione di passaggio.
