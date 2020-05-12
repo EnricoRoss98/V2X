@@ -6,7 +6,6 @@ import os
 import sys
 import random
 import math
-import array
 
 import subprocess
 import traci
@@ -777,7 +776,8 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
                                     # vedo se percorso e' libero, e se si allora la faccio partire
                                     rientro4 = avantiAuto(auto_ferma, passaggio[incrID], attesa[incrID], ferme[incrID],
                                                           matrice_incrocio[incrID], passaggio_cella[incrID],
-                                                          traiettorie_matrice, stop[incrID])
+                                                          traiettorie_matrice, stop[incrID], x_auto_in_celle,
+                                                          y_auto_in_celle)
 
                                     passaggio[incrID] = rientro4[0]
                                     attesa[incrID] = rientro4[1]
@@ -816,7 +816,6 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
 
     #
     # ---------- genero output e lo rimando indietro ----------
-    t_med_coda = 0.0
     f_ret = 0.0
     vm_ret = 0.0
     cm_ret = 0.0
