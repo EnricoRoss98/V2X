@@ -77,9 +77,9 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
         # print(traci.vehicle.getElectricityConsumption(auto_temp))
         if auto_temp not in consumo_temp:
             consumo_temp[auto_temp] = []
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 4)
+            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp))
         else:
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 4)
+            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp))
 
         # vm_temp.write(auto_temp + ": " + str(traci.vehicle.getSpeed(auto_temp)) + " |  ")
     # vm_temp.write("\n\n")
