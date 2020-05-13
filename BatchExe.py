@@ -131,13 +131,21 @@ for x in range(from_auto_test, to_auto_test + 1):
             str(x) + " " + string_vett1[0] + "," + string_vett1[1] + " " + string_vett2[0] + "," + string_vett2[
                 1] + "\n")
 
+        consumo_max = consumo_max - 1
+        consumo_med = consumo_med - 1
         consumo_max_s = str(consumo_max)
         consumo_med_s = str(consumo_med)
         string_vett1 = consumo_max_s.rsplit(".")
         string_vett2 = consumo_med_s.rsplit(".")
-        cons.write(
-            str(x) + " " + string_vett1[0] + "," + string_vett1[1] + " " + string_vett2[0] + "," + string_vett2[
-                1] + "\n")
+        if consumo_max > 0:  # inserisco segno + se non c'e'
+            consumo_max_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            consumo_max_s = string_vett1[0] + "," + string_vett1[1]
+        if consumo_med > 0:  # inserisco segno + se non c'e'
+            consumo_med_s = "+" + string_vett2[0] + "," + string_vett2[1]
+        else:
+            consumo_med_s = string_vett2[0] + "," + string_vett2[1]
+        cons.write(str(x) + " " + consumo_max_s + " " + consumo_med_s + "\n")
 
 t.close()
 f.close()
