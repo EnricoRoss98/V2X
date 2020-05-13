@@ -115,7 +115,7 @@ def celle_occupate_data_ang(ang, x_auto_in_celle_temp, y_auto_in_celle_temp):
     celle_occupate = []
     ang = ang % 180
     ang = - ang
-    x_auto = x_auto_in_celle_temp
+    x_auto = x_auto_in_celle_temp * 1.3
     y_auto = y_auto_in_celle_temp
     ang = math.radians(ang)  # converto in radianti
     a1 = [- float(x_auto) / float(2), float(y_auto) / float(2)]
@@ -402,7 +402,7 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
             ferme_count += 1
         vmed += traci.vehicle.getSpeed(auto_temp)
 
-        print(traci.vehicle.getElectricityConsumption(auto_temp))
+        # print(traci.vehicle.getElectricityConsumption(auto_temp))
         if auto_temp not in consumo_temp:
             consumo_temp[auto_temp] = []
             consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 4)
@@ -865,8 +865,8 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
     cm_ret = round(float(cm_ret) / float(len(cm_s)), 4)
     cx_ret = round(float(cx_ret) / float(len(cx_s)), 4)
 
-    print(consumo_medio)
-    print(consumo_massimo)
+    # print(consumo_medio)
+    # print(consumo_massimo)
 
     traci.close()
     return f_ret, vm_ret, cm_ret, cx_ret, step, max_t_coda, media_t_med_coda, consumo_massimo, consumo_medio

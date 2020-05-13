@@ -15,17 +15,15 @@ cons = open("Output/consumo.txt", "w")  # scrivo consumo medio e massimo rispett
 #
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
-from_auto_test = 0  # (per simulazione impostare a 10)
-to_auto_test = 0  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
+from_auto_test = 50  # (per simulazione impostare a 10)
+to_auto_test = 200  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 50  # (per simulazione impostare a 10)
-prove_fissate_auto = 1  # (per simulazione impostare a 10)
-gui = False
+prove_fissate_auto = 20  # (per simulazione impostare a 10)
+gui = True
 n_porta_base = 5000
-prove_una_auto = 1  # (per simulazione impostare a 20)
+prove_una_auto = 20  # (per simulazione impostare a 20)
 celle_per_lato = 20  # per protocolli basati sulla suddivisione matriciale dell'incrocio
-secondi_di_sicurezza = 2
-
-# per celle_lato = 20, sec_di_sicurezza = 2 e in BatchLib funzione celle_occupate_data_ang() x_auto = 2.5
+secondi_di_sicurezza = 10
 
 # ---------------------------------------------------------------- #
 #
@@ -138,7 +136,6 @@ for x in range(from_auto_test, to_auto_test + 1):
             str(x) + " " + string_vett1[0] + "," + string_vett1[1] + " " + string_vett2[0] + "," + string_vett2[
                 1] + "\n")
 
-        print(consumo0)
         consumo_max_s = str(consumo_max)
         consumo_med_s = str(consumo_med)
         string_vett1 = consumo_max_s.rsplit(".")
