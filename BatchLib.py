@@ -77,9 +77,9 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
         # print(traci.vehicle.getElectricityConsumption(auto_temp))
         if auto_temp not in consumo_temp:
             consumo_temp[auto_temp] = []
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp))
+            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 16)
         else:
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp))
+            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 16)
 
         # vm_temp.write(auto_temp + ": " + str(traci.vehicle.getSpeed(auto_temp)) + " |  ")
     # vm_temp.write("\n\n")
@@ -209,15 +209,15 @@ def run(port_t, n_auto, t_generazione, gui):
     # print(sumoBinary)
     sumoProcess = subprocess.Popen(
         [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "--time-to-teleport", "-1", "-Q",
-         "--step-length", "0.1"],
+         "--step-length", "0.001"],
         stdout=sys.stdout,
         stderr=sys.stderr)
 
     # -------- dichiarazione variabili --------
 
     traci.init(PORT)
-    step = 0.0
-    step_incr = 0.1
+    step = 0.000
+    step_incr = 0.036
 
     auto_in_simulazione = n_auto  # auto tot generate nella simulazione da passare come parametro in batch
     generaVeicoli(auto_in_simulazione, t_generazione)  # genero veicoli
@@ -318,14 +318,16 @@ def run(port_t, n_auto, t_generazione, gui):
                         attesa[incrID].pop(attesa[incrID].index(auto))
                         strade.pop(index_a)
 
-            tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
+            if int(step / step_incr) % 8 == 0:
+                tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
-        file_rit = output(arrayAuto, auto_in_simulazione, consumo)  # per generare stringhe di output
-        f_s.append(file_rit[0])
-        vm_s.append(file_rit[1])
-        cx_s.append(file_rit[2])
-        cm_s.append(file_rit[3])
-        consumo = file_rit[4]
+        if int(step / step_incr) % 16 == 0:
+            file_rit = output(arrayAuto, auto_in_simulazione, consumo)  # per generare stringhe di output
+            f_s.append(file_rit[0])
+            vm_s.append(file_rit[1])
+            cx_s.append(file_rit[2])
+            cm_s.append(file_rit[3])
+            consumo = file_rit[4]
 
         step += step_incr
         # print(step/step_incr)
