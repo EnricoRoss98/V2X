@@ -14,10 +14,10 @@ cons = open("Output/consumo.txt", "w")  # scrivo consumo medio e massimo rispett
 #
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
-from_auto_test = 50  # (per simulazione impostare a 10)
+from_auto_test = 50  # (per simulazione impostare a 50)
 to_auto_test = 200  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
-step_auto_test = 50  # (per simulazione impostare a 10)
-prove_fissate_auto = 1  # (per simulazione impostare a 10)
+step_auto_test = 50  # (per simulazione impostare a 50)
+prove_fissate_auto = 20  # (per simulazione impostare a 20)
 gui = False
 n_porta_base = 5000
 
