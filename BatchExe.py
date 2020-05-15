@@ -85,35 +85,18 @@ for x in range(from_auto_test, to_auto_test + 1):
         max_t_coda_s = str(max_t_coda)
         step_sim_s = str(step_sim)
 
-        string_vett = step_sim_s.rsplit(".")
-        t.write(str(x) + " " + string_vett[0] + "," + string_vett[1] + "\n")
+        t.write(str(x) + " " + step_sim_s + "\n")
 
-        string_vett = vm_s.rsplit(".")
-        vm.write(str(x) + " " + string_vett[0] + "," + string_vett[1] + "\n")
+        vm.write(str(x) + " " + vm_s + "\n")
 
-        string_vett = f_s.rsplit(".")
-        f.write(str(x) + " " + string_vett[0] + "," + string_vett[1] + "\n")
+        f.write(str(x) + " " + f_s + "\n")
 
-        string_vett1 = cm_s.rsplit(".")
-        string_vett2 = cx_s.rsplit(".")
-        cm.write(str(x) + " " + string_vett1[0] + "," + string_vett1[1] + " " + string_vett2[0] + "," + string_vett2[
-            1] + "\n")
+        cm.write(str(x) + " " + cm_s + " " + cx_s + "\n")
 
-        step_sim_s = str(step_sim)
-        string_vett = step_sim_s.rsplit(".")
-
-        string_vett1 = max_t_coda_s.rsplit(".")
-        string_vett2 = t_med_coda_s.rsplit(".")
-        t_coda.write(
-            str(x) + " " + string_vett1[0] + "," + string_vett1[1] + " " + string_vett2[0] + "," + string_vett2[
-                1] + "\n")
+        t_coda.write(str(x) + " " + max_t_coda_s + " " + t_med_coda_s + "\n")
 
         consumo_max_s = str(consumo_max)
         consumo_med_s = str(consumo_med)
-        string_vett1 = consumo_max_s.rsplit(".")
-        string_vett2 = consumo_med_s.rsplit(".")
-        consumo_max_s = string_vett1[0] + "," + string_vett1[1]
-        consumo_med_s = string_vett2[0] + "," + string_vett2[1]
         cons.write(str(x) + " " + consumo_max_s + " " + consumo_med_s + "\n")
 
 t.close()
