@@ -54,7 +54,7 @@
         <param key="constantPowerIntake" value="100"/>
         <param key="propulsionEfficiency" value="0.9"/>
         <param key="recuperationEfficiency" value="0.9"/>
-        <param key="stoppingTreshold" value="2.77777"/>
+        <param key="stoppingTreshold" value="0"/>
     </vType>
     <route edges="sotto-to-centr centr-to-sinis" color="green" id="route_0"/>
     <route edges="sotto-to-centr centr-to-sopra" color="green" id="route_1"/>
