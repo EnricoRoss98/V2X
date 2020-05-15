@@ -125,28 +125,24 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
         vmed = float(vmed) / float(len(arrayAuto_temp))
         vmed = round(vmed, 4)  # fino a 4 numeri dopo la virgola
 
-        # costruisco riga in file ferme
-        ferme_perc = float(ferme_count) / float(auto_in_simulazione_t)
-        ferme_perc = round(ferme_perc, 4)
-
         if len(code) > 0:
             # costruisco riga in file code
-            codemed = (float(codesum) / float(len(code))) / float(auto_in_simulazione_t)
+            codemed = float(codesum) / float(len(code))
             cmed = round(codemed, 4)
 
-            codemax = float(max(code)) / float(auto_in_simulazione_t)
+            codemax = max(code)
             cmax = round(codemax, 4)
 
         else:
             cmax = 0.0
             cmed = 0.0
     else:
-        ferme_perc = 0.0
+        ferme_count = 0
         vmed = 0.0
         cmax = 0.0
         cmed = 0.0
 
-    return ferme_perc, vmed, cmax, cmed, consumo_temp
+    return ferme_count, vmed, cmax, cmed, consumo_temp
 
 
 def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
