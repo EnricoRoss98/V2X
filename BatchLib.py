@@ -166,7 +166,7 @@ def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
 def generaVeicoli(n_auto_t, t_gen):
     r_depart = 0
     lane = 0
-    auto_ogni = int(t_gen / n_auto_t)
+    auto_ogni = t_gen / float(n_auto_t)
     for i in range(0, n_auto_t):
         r_route = int(random.randint(0, 11))
         # r_depart += int(random.expovariate(0.05))
@@ -179,10 +179,10 @@ def generaVeicoli(n_auto_t, t_gen):
             lane = "0"
         route = "route_" + str(r_route)
         id_veh = "veh_" + str(i)
-        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "8.33")
-        traci.vehicle.setMaxSpeed(id_veh, 8.33)
-        traci.vehicle.setAccel(id_veh, 2.1684)
-        traci.vehicle.setDecel(id_veh, 2.1684)
+        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "13.888888")
+        traci.vehicle.setMaxSpeed(id_veh, 13.888888)
+        traci.vehicle.setAccel(id_veh, 3.858024)
+        traci.vehicle.setDecel(id_veh, 3.858024)
 
 
 def run(port_t, n_auto, t_generazione, gui):
@@ -212,14 +212,16 @@ def run(port_t, n_auto, t_generazione, gui):
 
     # print(sumoBinary)
     sumoProcess = subprocess.Popen(
-        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "--time-to-teleport", "-1", "-Q"],
+        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "--time-to-teleport", "-1", "-Q",
+         "--step-length", "0.1"],
         stdout=sys.stdout,
         stderr=sys.stderr)
 
     # -------- dichiarazione variabili --------
 
     traci.init(PORT)
-    step = 0
+    step = 0.0
+    step_incr = 0.1
 
     auto_in_simulazione = n_auto  # auto tot generate nella simulazione da passare come parametro in batch
     generaVeicoli(auto_in_simulazione, t_generazione)  # genero veicoli
@@ -286,6 +288,8 @@ def run(port_t, n_auto, t_generazione, gui):
 
             for auto in arrayAuto:
 
+                # print(traci.vehicle.getSpeed(auto))
+
                 auto_in_lista = True
                 try:  # vedo se auto e' in lista tra le auto segnate per attraversare l'incrocio
                     presente = int(lista_arrivo[incrID].index(auto))
@@ -327,7 +331,8 @@ def run(port_t, n_auto, t_generazione, gui):
         cm_s.append(file_rit[3])
         consumo = file_rit[4]
 
-        step += 1
+        step += step_incr
+        # print(step/step_incr)
         traci.simulationStep(step)  # faccio avanzare la simulazione
 
         arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione
