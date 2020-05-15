@@ -24,7 +24,7 @@ cons0 = open("Output0/consumo.txt")  # scrivo consumo medio e massimo rispetto c
 from_auto_test = 50  # (per simulazione impostare a 10)
 to_auto_test = 200  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 50  # (per simulazione impostare a 10)
-prove_fissate_auto = 1  # (per simulazione impostare a 20)
+prove_fissate_auto = 20  # (per simulazione impostare a 20)
 max_auto_insieme = 12  # solo per Version4 e Versione7
 gui = False
 n_porta_base = 5000
@@ -115,15 +115,25 @@ for x in range(from_auto_test, to_auto_test + 1):
         consumo_max = round(float(consumo_max) / float(consumo_max0), 4)
         consumo_med = round(float(consumo_med) / float(consumo_med0), 4)
 
-        f_s = str(f_t - 1)
-        vm_s = str(vm_t - 1)
-        cm_s = str(cm_t - 1)
-        cx_s = str(cx_t - 1)
-        step_sim_s = str(step_sim - 1)
-        t_med_coda_s = str(t_med_coda - 1)
-        max_t_coda_s = str(max_t_coda - 1)
-        consumo_max_s = str(consumo_max - 1)
-        consumo_med_s = str(consumo_med - 1)
+        f_t = f_t - 1
+        vm_t = vm_t - 1
+        cm_t = cm_t - 1
+        cx_t = cx_t - 1
+        step_sim = step_sim - 1
+        t_med_coda = t_med_coda - 1
+        max_t_coda = max_t_coda - 1
+        consumo_max = consumo_max - 1
+        consumo_med = consumo_med - 1
+
+        f_s = str(f_t)
+        vm_s = str(vm_t)
+        cm_s = str(cm_t)
+        cx_s = str(cx_t)
+        step_sim_s = str(step_sim)
+        t_med_coda_s = str(t_med_coda)
+        max_t_coda_s = str(max_t_coda)
+        consumo_max_s = str(consumo_max)
+        consumo_med_s = str(consumo_med)
 
         string_vett1 = vm_s.rsplit(".")
         if vm_t > 0:  # inserisco segno + se non c'e'
