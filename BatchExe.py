@@ -115,44 +115,71 @@ for x in range(from_auto_test, to_auto_test + 1):
         consumo_max = round(float(consumo_max) / float(consumo_max0), 4)
         consumo_med = round(float(consumo_med) / float(consumo_med0), 4)
 
-        f_s = str(f_t)
-        vm_s = str(vm_t)
-        cm_s = str(cm_t)
-        cx_s = str(cx_t)
-        step_sim_s = str(step_sim)
-        t_med_coda_s = str(t_med_coda)
-        max_t_coda_s = str(max_t_coda)
-        consumo_max_s = str(consumo_max)
-        consumo_med_s = str(consumo_med)
+        f_s = str(f_t - 1)
+        vm_s = str(vm_t - 1)
+        cm_s = str(cm_t - 1)
+        cx_s = str(cx_t - 1)
+        step_sim_s = str(step_sim - 1)
+        t_med_coda_s = str(t_med_coda - 1)
+        max_t_coda_s = str(max_t_coda - 1)
+        consumo_max_s = str(consumo_max - 1)
+        consumo_med_s = str(consumo_med - 1)
 
         string_vett1 = vm_s.rsplit(".")
-        vm_s = string_vett1[0] + "," + string_vett1[1]
+        if vm_t > 0:  # inserisco segno + se non c'e'
+            vm_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            vm_s = string_vett1[0] + "," + string_vett1[1]
         vm.write(str(x) + " " + vm_s + "\n")
 
         string_vett1 = f_s.rsplit(".")
-        f_s = string_vett1[0] + "," + string_vett1[1]
+        if f_t > 0:  # inserisco segno + se non c'e'
+            f_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            f_s = string_vett1[0] + "," + string_vett1[1]
         f.write(str(x) + " " + f_s + "\n")
 
         string_vett1 = cm_s.rsplit(".")
         string_vett2 = cx_s.rsplit(".")
-        cm_s = string_vett1[0] + "," + string_vett1[1]
-        cx_s = string_vett2[0] + "," + string_vett2[1]
+        if cm_t > 0:  # inserisco segno + se non c'e'
+            cm_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            cm_s = string_vett1[0] + "," + string_vett1[1]
+        if cx_t > 0:  # inserisco segno + se non c'e'
+            cx_s = "+" + string_vett2[0] + "," + string_vett2[1]
+        else:
+            cx_s = string_vett2[0] + "," + string_vett2[1]
         cm.write(str(x) + " " + cm_s + " " + cx_s + "\n")
 
         string_vett1 = step_sim_s.rsplit(".")
-        step_sim_s = string_vett1[0] + "," + string_vett1[1]
+        if step_sim > 0:  # inserisco segno + se non c'e'
+            step_sim_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            step_sim_s = string_vett1[0] + "," + string_vett1[1]
         t.write(str(x) + " " + step_sim_s + "\n")
 
         string_vett1 = max_t_coda_s.rsplit(".")
         string_vett2 = t_med_coda_s.rsplit(".")
-        max_t_coda_s = string_vett1[0] + "," + string_vett1[1]
-        t_med_coda_s = string_vett2[0] + "," + string_vett2[1]
+        if max_t_coda > 0:  # inserisco segno + se non c'e'
+            max_t_coda_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            max_t_coda_s = string_vett1[0] + "," + string_vett1[1]
+        if t_med_coda > 0:  # inserisco segno + se non c'e'
+            t_med_coda_s = "+" + string_vett2[0] + "," + string_vett2[1]
+        else:
+            t_med_coda_s = string_vett2[0] + "," + string_vett2[1]
         t_coda.write(str(x) + " " + max_t_coda_s + " " + t_med_coda_s + "\n")
 
         string_vett1 = consumo_max_s.rsplit(".")
         string_vett2 = consumo_med_s.rsplit(".")
-        consumo_max_s = string_vett1[0] + "," + string_vett1[1]
-        consumo_med_s = string_vett2[0] + "," + string_vett2[1]
+        if consumo_max > 0:  # inserisco segno + se non c'e'
+            consumo_max_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            consumo_max_s = string_vett1[0] + "," + string_vett1[1]
+        if consumo_med > 0:  # inserisco segno + se non c'e'
+            consumo_med_s = "+" + string_vett2[0] + "," + string_vett2[1]
+        else:
+            consumo_med_s = string_vett2[0] + "," + string_vett2[1]
         cons.write(str(x) + " " + consumo_max_s + " " + consumo_med_s + "\n")
 
 t.close()

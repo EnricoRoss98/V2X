@@ -250,7 +250,6 @@ def generaVeicoli(n_auto_t, t_gen):
 
 def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
     # -------- import python modules from the $SUMO_HOME/tools directory --------
-    global dist_stop
     try:
         sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', "tools"))  # tutorial in tests
         sys.path.append(os.path.join(os.environ.get("SUMO_HOME", os.path.join(
@@ -284,7 +283,7 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
     traci.init(PORT)
     step = 0.000
-    step_incr = 0.072
+    step_incr = 0.036
 
     auto_in_simulazione = n_auto  # auto tot generate nella simulazione da passare come parametro in batch
     generaVeicoli(auto_in_simulazione, t_generazione)  # genero veicoli
@@ -408,6 +407,7 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
                                 else:
                                     v_auto = traci.vehicle.getSpeed(auto)
                                     decel = traci.vehicle.getDecel(auto)
+                                    dist_stop = 0
 
                                     ang = traci.vehicle.getAngle(auto)
 
@@ -431,6 +431,7 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
                                         ferme[incrID] = rientro4[3]
 
             # se ci sono auto in passaggio ma se girano tutte a destra allora cambia condizione di passaggio
+            tutte_svolta_a_dx = False
             if passaggio[incrID]:
                 tutte_svolta_a_dx = True  # controllo se tutte le auto girano a destra
                 for ID_auto_in_passaggio in range(0, len(passaggio[incrID])):
