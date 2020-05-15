@@ -145,9 +145,9 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
         # print(traci.vehicle.getElectricityConsumption(auto_temp))
         if auto_temp not in consumo_temp:
             consumo_temp[auto_temp] = []
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 2)
+            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 4)
         else:
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 2)
+            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 4)
 
         # print(traci.vehicle.getElectricityConsumption(auto_temp) * 2)
         # print(traci.vehicle.getSpeed(auto_temp))
@@ -196,28 +196,24 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
         vmed = float(vmed) / float(len(arrayAuto_temp))
         vmed = round(vmed, 4)  # fino a 4 numeri dopo la virgola
 
-        # costruisco riga in file ferme
-        ferme_perc = float(ferme_count) / float(auto_in_simulazione_t)
-        ferme_perc = round(ferme_perc, 4)
-
         if len(code) > 0:
             # costruisco riga in file code
-            codemed = (float(codesum) / float(len(code))) / float(auto_in_simulazione_t)
+            codemed = float(codesum) / float(len(code))
             cmed = round(codemed, 4)
 
-            codemax = float(max(code)) / float(auto_in_simulazione_t)
+            codemax = max(code)
             cmax = round(codemax, 4)
 
         else:
             cmax = 0.0
             cmed = 0.0
     else:
-        ferme_perc = 0.0
+        ferme_count = 0
         vmed = 0.0
         cmax = 0.0
         cmed = 0.0
 
-    return ferme_perc, vmed, cmed, cmax, consumo_temp
+    return ferme_count, vmed, cmed, cmax, consumo_temp
 
 
 def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
@@ -581,9 +577,10 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
                         conta_passaggi[incrID] = 0
                         conta_passaggi_old[incrID] = 0
 
-            tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
+            if int(step / step_incr) % 2 == 0:  # ogni 2 step ne calcola output
+                tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
-        if int(step / step_incr) % 2 == 0:  # ogni 2 step ne calcola output
+        if int(step / step_incr) % 4 == 0:  # ogni 4 step ne calcola output
             file_rit = output(arrayAuto, auto_in_simulazione, consumo)  # per generare stringhe di output
             f_s.append(file_rit[0])
             vm_s.append(file_rit[1])
