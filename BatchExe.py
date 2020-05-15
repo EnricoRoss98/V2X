@@ -11,41 +11,39 @@ t = open("Output/tempo.txt", "w")  # scrivo il tempo impiegato per terminare la 
 t_coda = open("Output/t_in_coda.txt", "w")  # scrivo il tempo medio in coda rispetto al tempo tot di simulaz.
 cons = open("Output/consumo.txt", "w")  # scrivo consumo medio e massimo rispetto consumo in assenza di traffico (%)
 
+f0 = open("Output0/ferme.txt")  # creo file ferme.txt percentuale di auto ferme
+vm0 = open("Output0/vel_med.txt")  # creo file vel_med vel. media delle auto presenti
+cm0 = open("Output0/code.txt")  # creo file code contiene coda piu' lunga e n med auto in coda (%)
+t0 = open("Output0/tempo.txt")  # scrivo il tempo impiegato per terminare la simulazione rispetto no code
+t_coda0 = open("Output0/t_in_coda.txt")  # scrivo il tempo medio in coda rispetto al tempo tot di simulaz.
+cons0 = open("Output0/consumo.txt")  # scrivo consumo medio e massimo rispetto consumo in assenza di traffico (%)
+
 #
 #
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
-from_auto_test = 50  # (per simulazione impostare a 10)
+from_auto_test = 200  # (per simulazione impostare a 10)
 to_auto_test = 200  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 50  # (per simulazione impostare a 10)
-prove_fissate_auto = 20  # (per simulazione impostare a 10)
-gui = False
+prove_fissate_auto = 1  # (per simulazione impostare a 10)
+gui = True
 n_porta_base = 5000
-prove_una_auto = 40  # (per simulazione impostare a 20)
 celle_per_lato = 20  # per protocolli basati sulla suddivisione matriciale dell'incrocio
-secondi_di_sicurezza = 10
+secondi_di_sicurezza = 1
 
 # ---------------------------------------------------------------- #
 #
 #
 
-tempo_generazione = 600 * 2  # fissato
-step0 = 0
-step_sim = 0
-consumo0 = 0
+tempo_generazione = 43.2  # fissato
+lines1 = f0.readlines()
+lines2 = vm0.readlines()
+lines3 = cm0.readlines()
+lines4 = t0.readlines()
+lines5 = t_coda0.readlines()
+lines6 = cons0.readlines()
 
 traiettorie_matrice = Traiettorie.run(n_porta_base, False, celle_per_lato)
-
-# eseguo prove per rilevare tempo in condizione standard, con una sola auto
-for y in range(0, prove_una_auto):
-    n_port = n_porta_base + y + 1
-    ret = BatchLib.run(n_port, 1, tempo_generazione, False, celle_per_lato, traiettorie_matrice, secondi_di_sicurezza)
-    step_sim += float(ret[4])
-    consumo0 += float(ret[7])
-
-step_sim = round(float(step_sim) / float(prove_una_auto), 4)
-consumo0 = round(float(consumo0) / float(prove_una_auto), 4)
-step0 = step_sim  # salvo tempo in situazione base, 1 sola auto senza fermarsi
 
 for x in range(from_auto_test, to_auto_test + 1):
     if x % step_auto_test == 0:
@@ -76,7 +74,7 @@ for x in range(from_auto_test, to_auto_test + 1):
         for y in range(0, prove_fissate_auto):
             ret = pool_arr[y].get()
             f_t += float(ret[0])
-            vm_t += float(float(ret[1])/float(0.5))
+            vm_t += float(ret[1])
             cm_t += float(ret[2])
             cx_t += float(ret[3])
             step_sim += float(ret[4])
@@ -85,61 +83,108 @@ for x in range(from_auto_test, to_auto_test + 1):
             consumo_max += float(ret[7])
             consumo_med += float(ret[8])
 
-        f_t = round(float(f_t) / float(prove_fissate_auto), 4)
-        vm_t = round(float(vm_t) / float(prove_fissate_auto), 4)
-        cm_t = round(float(cm_t) / float(prove_fissate_auto), 4)
-        cx_t = round(float(cx_t) / float(prove_fissate_auto), 4)
-        step_sim = round(float(step_sim) / float(prove_fissate_auto), 4)
+        f_t = float(f_t) / float(prove_fissate_auto)
+        vm_t = float(vm_t) / float(prove_fissate_auto)
+        cm_t = float(cm_t) / float(prove_fissate_auto)
+        cx_t = float(cx_t) / float(prove_fissate_auto)
+        step_sim = float(step_sim) / float(prove_fissate_auto)
+        max_t_coda = float(max_t_coda) / float(prove_fissate_auto)
+        t_med_coda = float(t_med_coda) / float(prove_fissate_auto)
+        consumo_max = float(consumo_max) / float(prove_fissate_auto)
+        consumo_med = float(consumo_med) / float(prove_fissate_auto)
 
-        max_t_coda = round(float(max_t_coda) / float(prove_fissate_auto), 4)
-        max_t_coda = round(float(max_t_coda) / float(step_sim), 4)  # tempo massimo in coda rispetto al tempo tot di sim
-        t_med_coda = round(float(t_med_coda) / float(prove_fissate_auto), 4)
-        t_med_coda = round(float(t_med_coda) / float(step_sim), 4)  # tempo medio in coda rispetto al tempo tot di sim
+        indice_riga = 0
+        for c in range(0, 5):
+            linea = lines1[c].split(" ")
+            if linea[0].__contains__(str(x)):
+                indice_riga = c
+                break
 
-        # calcolo consimo medio e massimo rispetto al consumo calcolato in assenza di congestione
-        consumo_max = round(float(consumo_max) / float(prove_fissate_auto), 4)
-        consumo_max = round(float(consumo_max) / float(consumo0), 4)
-        consumo_med = round(float(consumo_med) / float(prove_fissate_auto), 4)
-        consumo_med = round(float(consumo_med) / float(consumo0), 4)
+        f_t0 = float((lines1[indice_riga].split(" "))[1])
+        vm_t0 = float((lines2[indice_riga].split(" "))[1])
+        cm_t0 = float((lines3[indice_riga].split(" "))[1])
+        cx_t0 = float((lines3[indice_riga].split(" "))[2])
+        step_sim0 = float((lines4[indice_riga].split(" "))[1])
+        max_t_coda0 = float((lines5[indice_riga].split(" "))[1])
+        t_med_coda0 = float((lines5[indice_riga].split(" "))[2])
+        consumo_max0 = float((lines6[indice_riga].split(" "))[1])
+        consumo_med0 = float((lines6[indice_riga].split(" "))[2])
+
+        f_t = round(float(f_t) / float(f_t0), 4)
+        vm_t = round(float(vm_t) / float(vm_t0), 4)
+        cm_t = round(float(cm_t) / float(cm_t0), 4)
+        cx_t = round(float(cx_t) / float(cx_t0), 4)
+        step_sim = round(float(step_sim) / float(step_sim0), 4)
+        max_t_coda = round(float(max_t_coda) / float(max_t_coda0), 4)
+        t_med_coda = round(float(t_med_coda) / float(t_med_coda0), 4)
+        consumo_max = round(float(consumo_max) / float(consumo_max0), 4)
+        consumo_med = round(float(consumo_med) / float(consumo_med0), 4)
+
+        f_t = f_t - 1
+        vm_t = vm_t - 1
+        cm_t = cm_t - 1
+        cx_t = cx_t - 1
+        step_sim = step_sim - 1
+        t_med_coda = t_med_coda - 1
+        max_t_coda = max_t_coda - 1
+        consumo_max = consumo_max - 1
+        consumo_med = consumo_med - 1
 
         f_s = str(f_t)
         vm_s = str(vm_t)
         cm_s = str(cm_t)
         cx_s = str(cx_t)
+        step_sim_s = str(step_sim)
         t_med_coda_s = str(t_med_coda)
         max_t_coda_s = str(max_t_coda)
+        consumo_max_s = str(consumo_max)
+        consumo_med_s = str(consumo_med)
 
-        string_vett = vm_s.rsplit(".")
-        vm.write(str(x) + " " + string_vett[0] + "," + string_vett[1] + "\n")
+        string_vett1 = vm_s.rsplit(".")
+        if vm_t > 0:  # inserisco segno + se non c'e'
+            vm_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            vm_s = string_vett1[0] + "," + string_vett1[1]
+        vm.write(str(x) + " " + vm_s + "\n")
 
-        string_vett = f_s.rsplit(".")
-        f.write(str(x) + " " + string_vett[0] + "," + string_vett[1] + "\n")
+        string_vett1 = f_s.rsplit(".")
+        if f_t > 0:  # inserisco segno + se non c'e'
+            f_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            f_s = string_vett1[0] + "," + string_vett1[1]
+        f.write(str(x) + " " + f_s + "\n")
 
         string_vett1 = cm_s.rsplit(".")
         string_vett2 = cx_s.rsplit(".")
-        cm.write(str(x) + " " + string_vett1[0] + "," + string_vett1[1] + " " + string_vett2[0] + "," + string_vett2[
-            1] + "\n")
-
-        # creare percentuale relativa al step0
-        perc = round((float(step_sim) / float(step0)) - 1,
-                     4)  # calcolo percentuale rispetto situazione di base (1 auto)
-        step_sim_s = str(perc)
-        string_vett = step_sim_s.rsplit(".")
-        if perc > 0:  # inserisco segno + se non c'e'
-            t.write(str(x) + " +" + string_vett[0] + "," + string_vett[1] + "\n")
+        if cm_t > 0:  # inserisco segno + se non c'e'
+            cm_s = "+" + string_vett1[0] + "," + string_vett1[1]
         else:
-            t.write(str(x) + " " + string_vett[0] + "," + string_vett[1] + "\n")
+            cm_s = string_vett1[0] + "," + string_vett1[1]
+        if cx_t > 0:  # inserisco segno + se non c'e'
+            cx_s = "+" + string_vett2[0] + "," + string_vett2[1]
+        else:
+            cx_s = string_vett2[0] + "," + string_vett2[1]
+        cm.write(str(x) + " " + cm_s + " " + cx_s + "\n")
+
+        string_vett1 = step_sim_s.rsplit(".")
+        if step_sim > 0:  # inserisco segno + se non c'e'
+            step_sim_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            step_sim_s = string_vett1[0] + "," + string_vett1[1]
+        t.write(str(x) + " " + step_sim_s + "\n")
 
         string_vett1 = max_t_coda_s.rsplit(".")
         string_vett2 = t_med_coda_s.rsplit(".")
-        t_coda.write(
-            str(x) + " " + string_vett1[0] + "," + string_vett1[1] + " " + string_vett2[0] + "," + string_vett2[
-                1] + "\n")
+        if max_t_coda > 0:  # inserisco segno + se non c'e'
+            max_t_coda_s = "+" + string_vett1[0] + "," + string_vett1[1]
+        else:
+            max_t_coda_s = string_vett1[0] + "," + string_vett1[1]
+        if t_med_coda > 0:  # inserisco segno + se non c'e'
+            t_med_coda_s = "+" + string_vett2[0] + "," + string_vett2[1]
+        else:
+            t_med_coda_s = string_vett2[0] + "," + string_vett2[1]
+        t_coda.write(str(x) + " " + max_t_coda_s + " " + t_med_coda_s + "\n")
 
-        consumo_max = consumo_max - 1
-        consumo_med = consumo_med - 1
-        consumo_max_s = str(consumo_max)
-        consumo_med_s = str(consumo_med)
         string_vett1 = consumo_max_s.rsplit(".")
         string_vett2 = consumo_med_s.rsplit(".")
         if consumo_max > 0:  # inserisco segno + se non c'e'
@@ -152,11 +197,17 @@ for x in range(from_auto_test, to_auto_test + 1):
             consumo_med_s = string_vett2[0] + "," + string_vett2[1]
         cons.write(str(x) + " " + consumo_max_s + " " + consumo_med_s + "\n")
 
-t.close()
-f.close()
-cm.close()
-vm.close()
-t_coda.close()
-cons.close()
-print("\n\n\n\n\n\n\n")
-print("FINE")
+    t.close()
+    f.close()
+    cm.close()
+    vm.close()
+    t_coda.close()
+    cons.close()
+    t0.close()
+    f0.close()
+    cm0.close()
+    vm0.close()
+    t_coda0.close()
+    cons0.close()
+    print("\n\n\n\n\n\n\n")
+    print("FINE")

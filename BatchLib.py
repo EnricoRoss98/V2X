@@ -106,7 +106,7 @@ def t_arrivo_cella(auto_temp, metri_da_incrocio_temp, metri_da_cella_temp):  # r
 
     t = - (vi / a) + (math.sqrt((vi * vi) + (2 * a * (metri_da_cella_temp - metri_da_incrocio_temp))) / a) + \
         (metri_da_cella_temp / vf) - (((vf * vf) - (vi * vi)) / (2 * a * vf)) + (metri_da_incrocio_temp / vf)
-    t = round(t, 3)
+    t = round(t, 4)
     return t + traci.simulation.getTime()
 
 
@@ -405,9 +405,12 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
         # print(traci.vehicle.getElectricityConsumption(auto_temp))
         if auto_temp not in consumo_temp:
             consumo_temp[auto_temp] = []
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 4)
+            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 8)
         else:
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 4)
+            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 8)
+
+        # print(traci.vehicle.getElectricityConsumption(auto_temp) * 2)
+        # print(traci.vehicle.getSpeed(auto_temp))
 
         # vm_temp.write(auto_temp + ": " + str(traci.vehicle.getSpeed(auto_temp)) + " |  ")
     # vm_temp.write("\n\n")
@@ -453,28 +456,24 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
         vmed = float(vmed) / float(len(arrayAuto_temp))
         vmed = round(vmed, 4)  # fino a 4 numeri dopo la virgola
 
-        # costruisco riga in file ferme
-        ferme_perc = float(ferme_count) / float(auto_in_simulazione_t)
-        ferme_perc = round(ferme_perc, 4)
-
         if len(code) > 0:
             # costruisco riga in file code
-            codemed = (float(codesum) / float(len(code))) / float(auto_in_simulazione_t)
+            codemed = float(codesum) / float(len(code))
             cmed = round(codemed, 4)
 
-            codemax = float(max(code)) / float(auto_in_simulazione_t)
+            codemax = max(code)
             cmax = round(codemax, 4)
 
         else:
             cmax = 0.0
             cmed = 0.0
     else:
-        ferme_perc = 0.0
+        ferme_count = 0
         vmed = 0.0
         cmax = 0.0
         cmed = 0.0
 
-    return ferme_perc, vmed, cmed, cmax, consumo_temp
+    return ferme_count, vmed, cmed, cmax, consumo_temp
 
 
 def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
@@ -494,7 +493,7 @@ def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
 def generaVeicoli(n_auto_t, t_gen):
     r_depart = 0
     lane = 0
-    auto_ogni = int(t_gen / n_auto_t)
+    auto_ogni = float(t_gen) / float(n_auto_t)
     for i in range(0, n_auto_t):
         r_route = int(random.randint(0, 11))
         # r_depart += int(random.expovariate(0.05))
@@ -509,10 +508,7 @@ def generaVeicoli(n_auto_t, t_gen):
         id_veh = "veh_" + str(i)
 
         # 4 istruzioni sotto permettono di cambiare velocita' massima e accelerazione/decelerazione per la simulazione
-        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "0.5")
-        traci.vehicle.setMaxSpeed(id_veh, 0.5)
-        traci.vehicle.setAccel(id_veh, 0.0078125)
-        traci.vehicle.setDecel(id_veh, 0.0078125)
+        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "13.888888")
 
 
 def pulisci_matrice(matrice_incrocio_temp, sec_sicurezza_temp):
@@ -560,7 +556,8 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
 
     # print(sumoBinary)
     sumoProcess = subprocess.Popen(
-        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "-S", "--time-to-teleport", "-1", "-Q"],
+        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "-S", "--time-to-teleport", "-1", "-Q",
+         "--step-length", "0.001"],
         stdout=sys.stdout,
         stderr=sys.stderr)
     # sumoProcess = subprocess.Popen(
@@ -572,7 +569,8 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
     # -------- dichiarazione variabili --------
 
     traci.init(PORT)
-    step = 0
+    step = 0.000
+    step_incr = 0.036
 
     auto_in_simulazione = n_auto  # auto tot generate nella simulazione da passare come parametro in batch
     generaVeicoli(auto_in_simulazione, t_generazione)  # genero veicoli
@@ -686,8 +684,8 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
 
                     stop_temp = stop[incrID]
                     if len(stop_temp) > 3:  # se ci sono i 4 lati dell'incrocio
-                        if (stop_temp[3] - 17 <= pos[0] <= stop_temp[1] + 17) and \
-                                (stop_temp[2] - 17 <= pos[1] <= stop_temp[0] + 17):  # 1 +16 m to stop from 30km/h
+                        if (stop_temp[3] - 26 <= pos[0] <= stop_temp[1] + 26) and \
+                                (stop_temp[2] - 26 <= pos[1] <= stop_temp[0] + 26):  # 1 +16 m to stop from 30km/h
 
                             leader = traci.vehicle.getLeader(auto)  # salvo il leader (nome_auto, distanza)
                             if leader:
@@ -763,7 +761,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
                 matrice_incrocio[incrID] = rientro2[1]
                 passaggio_cella[incrID] = rientro2[2]
 
-                if step % 2 == 0:
+                if int(step / step_incr) % 2 == 0:
                     if len(ferme[incrID]) > 0:  # se ci sono auto ferme, vedo se posso farne partire qualcuna
 
                         # scorri tra tutte le auto ferme e se una e' compatibile con la matrice allora falla partire
@@ -785,7 +783,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
                                     matrice_incrocio[incrID] = rientro4[3]
                                     passaggio_cella[incrID] = rientro4[4]
 
-            if step % 2 == 0:
+            if int(step / step_incr) % 4 == 0:
                 tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
             # STAMPO LA MATRICE
@@ -796,7 +794,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
             #     print(x)
             # print("\n\n")
 
-        if step % 4 == 0:  # ogni 2 step ne calcola output
+        if int(step / step_incr) % 8 == 0:  # ogni 8 step ne calcola output
             file_rit = output(arrayAuto, auto_in_simulazione, consumo)  # per generare stringhe di output
             f_s.append(file_rit[0])
             vm_s.append(file_rit[1])
@@ -804,12 +802,12 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
             cx_s.append(file_rit[3])
             consumo = file_rit[4]
 
-        if step % 10 == 0:  # ogni 10 step pulisco la matrice da valori troppo vecchi
+        if int(step / step_incr) % 10 == 0:  # ogni 10 step pulisco la matrice da valori troppo vecchi
             matrice_incrocio = pulisci_matrice(matrice_incrocio, sec_sicurezza)
 
         coloreAuto(arrayAuto, junctIDList, attesa, ferme)  # assegna colori alle auto
 
-        step += 1
+        step += step_incr
         traci.simulationStep(step)  # faccio avanzare la simulazione
 
         arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione

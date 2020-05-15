@@ -41,8 +41,7 @@
 -->
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <vType id="Car" maxSpeed="1.00" vClass="passenger" accel="0.03125" decel="0.03125" lcKeepRight="0.0"
-           emissionClass="Energy/unknown">
+    <vType id="Car" maxSpeed="13.888888" vClass="passenger" accel="3.858024" decel="3.858024" lcKeepRight="0.0"  emissionClass="Energy/unknown">
         <param key="has.battery.device" value="true"/>
         <param key="maximumBatteryCapacity" value="40000"/>
         <param key="maximumPower" value="110000"/>
