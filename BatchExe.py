@@ -17,17 +17,17 @@ cons = open("Output/consumo.txt", "w")  # scrivo consumo medio e massimo rispett
 from_auto_test = 50  # (per simulazione impostare a 10)
 to_auto_test = 200  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 50  # (per simulazione impostare a 10)
-prove_fissate_auto = 20  # (per simulazione impostare a 10)
+prove_fissate_auto = 1  # (per simulazione impostare a 10)
 max_auto_insieme = 12  # solo per Version4 e Versione7
-gui = False
+gui = True
 n_porta_base = 5000
-prove_una_auto = 40  # (per simulazione impostare a 20)
+prove_una_auto = 1  # (per simulazione impostare a 20)
 
 # ---------------------------------------------------------------- #
 #
 #
 
-tempo_generazione = 600  # fissato
+tempo_generazione = 43.2  # fissato
 step0 = 0
 step_sim = 0
 consumo0 = 0

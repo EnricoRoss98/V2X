@@ -6,8 +6,6 @@
 import os
 import sys
 import random
-import math
-import array
 
 import subprocess
 import traci
@@ -42,10 +40,6 @@ def arrivoAuto(auto_temp, occupato_temp, passaggio_temp, ferme_temp, attesa_temp
         passaggio_temp.append([auto_temp, traci.vehicle.getRoadID(auto_temp), traci.vehicle.getAngle(auto_temp)])
         attesa_temp.pop(attesa_temp.index(auto_temp))  # lo tolgo dalla lista d'attesa
 
-        rotta = traci.vehicle.getRouteID(auto_temp)
-        if rotta == "route_2" or rotta == "route_4" or rotta == "route_6" or rotta == "route_11":  # se gira a DX
-            traci.vehicle.setSpeed(auto_temp, traci.vehicle.getMaxSpeed(auto_temp) / float(2))
-
     ritorno = [occupato_temp, passaggio_temp, attesa_temp, ferme_temp]
     return ritorno
 
@@ -58,10 +52,6 @@ def isLibero(occupato_temp, passaggio_temp):  # controllo se l'incrocio si e' li
             road = prossimaStrada(passaggio_temp[i])  # prossima via
             if traci.vehicle.getRoadID(passaggio_temp[i][0]) == road:  # se l'auto cambia via la tolgo da passaggio
                 # print(passaggio_temp[i][0] + " ESCE!")
-
-                rotta = traci.vehicle.getRouteID(passaggio_temp[i][0])
-                if rotta == "route_2" or rotta == "route_4" or rotta == "route_6" or rotta == "route_11":  # gira a DX
-                    traci.vehicle.setSpeed(passaggio_temp[i][0], traci.vehicle.getMaxSpeed(passaggio_temp[i][0]))
 
                 esce = passaggio_temp[i]
                 if esce in passaggio_temp2:
@@ -78,10 +68,7 @@ def avantiAuto(occupato_temp, passaggio_temp, attesa_temp, ferme_temp, auto_da_i
     # traci.vehicle.resume(attesa_temp[0])  # faccio ripartire il primo
     # print("AUTO DA INSERIRE: " + auto_da_inserire)
     rotta = traci.vehicle.getRouteID(auto_da_inserire)
-    if rotta == "route_2" or rotta == "route_4" or rotta == "route_6" or rotta == "route_11":  # gira a DX
-        traci.vehicle.setSpeed(auto_da_inserire, traci.vehicle.getMaxSpeed(auto_da_inserire) / float(2))
-    else:
-        traci.vehicle.setSpeed(auto_da_inserire, traci.vehicle.getMaxSpeed(auto_da_inserire))  # riparte l'auto
+    traci.vehicle.setSpeed(auto_da_inserire, traci.vehicle.getMaxSpeed(auto_da_inserire))  # riparte l'auto
     passaggio_temp.append([auto_da_inserire, traci.vehicle.getRoadID(auto_da_inserire),
                            traci.vehicle.getAngle(auto_da_inserire)])
 
@@ -161,6 +148,9 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
             consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 2)
         else:
             consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 2)
+
+        # print(traci.vehicle.getElectricityConsumption(auto_temp) * 2)
+        # print(traci.vehicle.getSpeed(auto_temp))
 
         # vm_temp.write(auto_temp + ": " + str(traci.vehicle.getSpeed(auto_temp)) + " |  ")
     # vm_temp.write("\n\n")
@@ -245,12 +235,11 @@ def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
 
 
 def generaVeicoli(n_auto_t, t_gen):
-    r_depart = 0
+    r_depart = 0.0
     lane = 0
-    auto_ogni = int(t_gen / n_auto_t)
+    auto_ogni = float(t_gen) / float(n_auto_t)
     for i in range(0, n_auto_t):
         r_route = int(random.randint(0, 11))
-        # r_depart += int(random.expovariate(0.05))
         r_depart += auto_ogni
         if r_route == 0 or r_route == 5 or r_route == 8 or r_route == 10:
             lane = "2"
@@ -260,7 +249,7 @@ def generaVeicoli(n_auto_t, t_gen):
             lane = "0"
         route = "route_" + str(r_route)
         id_veh = "veh_" + str(i)
-        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "1")
+        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "13.888888")
 
 
 def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
@@ -290,14 +279,16 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
     # print(sumoBinary)
     sumoProcess = subprocess.Popen(
-        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "-S", "--time-to-teleport", "-1", "-Q"],
+        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "--time-to-teleport", "-1", "-Q",
+         "--step-length", "0.001"],
         stdout=sys.stdout,
         stderr=sys.stderr)
 
     # -------- dichiarazione variabili --------
 
     traci.init(PORT)
-    step = 0
+    step = 0.000
+    step_incr = 0.072
 
     auto_in_simulazione = n_auto  # auto tot generate nella simulazione da passare come parametro in batch
     generaVeicoli(auto_in_simulazione, t_generazione)  # genero veicoli
@@ -396,8 +387,8 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
                     stop_temp = stop[incrID]
                     if len(stop_temp) > 3:  # se ci sono i 4 lati dell'incrocio
-                        if (stop_temp[3] - 17 <= pos[0] <= stop_temp[1] + 17) and \
-                                (stop_temp[2] - 17 <= pos[1] <= stop_temp[0] + 17):  # 1 +16 m to stop from 30km/h
+                        if (stop_temp[3] - 26 <= pos[0] <= stop_temp[1] + 26) and \
+                                (stop_temp[2] - 26 <= pos[1] <= stop_temp[0] + 26):  # 1 + 25 m to stop from 50km/h
 
                             leader = traci.vehicle.getLeader(auto)  # salvo il leader (nome_auto, distanza)
                             if leader:
@@ -576,14 +567,14 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
             # controllo per cambio strategia di passaggio se non passano auto (o poche) tra due rilevazioni successive
             if conta_passaggi_old[incrID] > 4:  # permetto in questo modo alle auto di accelerarsi e arrivare a regime
-                if step % 10 == 0:  # controllo contatore passaggi
+                if int(step / step_incr) % 25 == 0:  # controllo contatore passaggi
                     if conta_passaggi_old[incrID] + 1 < conta_passaggi[incrID]:
                         conta_passaggi_old[incrID] = conta_passaggi[incrID]
                     else:
                         conta_passaggi[incrID] = 0
                         conta_passaggi_old[incrID] = 0
             else:
-                if step % 15 == 0:  # controllo contatore passaggi
+                if int(step / step_incr) % 35 == 0:  # controllo contatore passaggi
                     if conta_passaggi_old[incrID] < conta_passaggi[incrID]:
                         conta_passaggi_old[incrID] = conta_passaggi[incrID]
                     else:
@@ -592,7 +583,7 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
             tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
-        if step % 2 == 0:  # ogni 2 step ne calcola output
+        if int(step / step_incr) % 2 == 0:  # ogni 2 step ne calcola output
             file_rit = output(arrayAuto, auto_in_simulazione, consumo)  # per generare stringhe di output
             f_s.append(file_rit[0])
             vm_s.append(file_rit[1])
@@ -602,7 +593,8 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
         coloreAuto(arrayAuto, junctIDList, attesa, ferme)  # assegna colori alle auto
 
-        step += 1
+        step += step_incr
+        # print(step/step_incr)
         traci.simulationStep(step)  # faccio avanzare la simulazione
 
         arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione
