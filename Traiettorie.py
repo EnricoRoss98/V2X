@@ -78,7 +78,8 @@ def costruzioneArray(arrayAuto_temp):  # costruzione dell'array composto dal nom
     for id_auto in loadedIDList:
         if id_auto not in arrayAuto_temp:
             arrayAuto_temp.append(id_auto)
-            traci.vehicle.setSpeed(id_auto, 1.0)
+            traci.vehicle.setSpeed(id_auto, 8.33333)
+            traci.vehicle.setSpeedMode(id_auto, 0)
             # print("AUTO INSERT " + id_auto)
 
     arrivedIDList = traci.simulation.getArrivedIDList()  # elimina nell'array le auto arrivate
@@ -91,9 +92,9 @@ def costruzioneArray(arrayAuto_temp):  # costruzione dell'array composto dal nom
 
 
 def generaVeicoli():
-    r_depart = -49
+    r_depart = -9
     lane = 0
-    auto_ogni = 50
+    auto_ogni = 10
     for i in range(0, 11):
         r_route = i
         r_depart += auto_ogni
@@ -136,14 +137,16 @@ def run(port_t, gui, celle_per_lato):
 
     # print(sumoBinary)
     sumoProcess = subprocess.Popen(
-        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "--time-to-teleport", "-1", "-Q"],
+        [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "--time-to-teleport", "-1", "-Q",
+         "--step-length", "0.001"],
         stdout=sys.stdout,
         stderr=sys.stderr)
 
     # -------- dichiarazione variabili --------
 
     traci.init(PORT)
-    step = 0
+    step = 0.000
+    step_incr = 0.032
 
     generaVeicoli()  # genero veicoli
 
@@ -243,7 +246,7 @@ def run(port_t, gui, celle_per_lato):
                             index2 = time_entrata_in_incrocio.index(x)
                     time_diff = step - time_entrata_in_incrocio[index2][1]
                     # CALCOLO METRI (tempo X velocita' auto)
-                    metri = float(time_diff) * 0.5
+                    metri = float(time_diff) * traci.vehicle.getMaxSpeed(auto)
 
                     # RILEVO angolo
                     ang = traci.vehicle.getAngle(auto)
@@ -283,7 +286,7 @@ def run(port_t, gui, celle_per_lato):
                         # print(route)
                         # print("Posizione attuale: " + str(pos_attuale_X) + " | " + str(pos_attuale_Y))
 
-        step += 1
+        step += step_incr
         traci.simulationStep(step)  # faccio avanzare la simulazione
 
         arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione

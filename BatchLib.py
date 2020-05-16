@@ -201,6 +201,7 @@ def arrivoAuto(auto_temp, passaggio_temp, ferme_temp, attesa_temp, matrice_incro
         traci.vehicle.setSpeed(auto_temp, 0.0)  # faccio fermare l'auto
     else:
         # puo' passare e la faccio passare, segnandola in matrice e vettori
+        traci.vehicle.setSpeedMode(auto_temp, 30)
         passaggio_temp.append([auto_temp, traci.vehicle.getRoadID(auto_temp), traci.vehicle.getAngle(auto_temp)])
         attesa_temp.pop(attesa_temp.index(auto_temp))  # lo tolgo dalla lista d'attesa e sotto scrivo nella matrice
         matrice_incrocio_temp = set_in_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matrice_temp,
@@ -237,7 +238,7 @@ def set_in_matrice_incrocio(auto_temp, matrice_incrocio_temp, traiettorie_matric
                             ((celle[0] + index_y) < len(matrice_incrocio_temp)) and \
                             ((celle[1] + index_x) < len(matrice_incrocio_temp)):
                         # print(str(celle[0] + index_y) + " | " + str(celle[1] + index_x))
-                        matrice_incrocio_temp[celle[0] + index_y][celle[1] + index_x].append(timestep)
+                        matrice_incrocio_temp[celle[0] + index_y][celle[1] + index_x].append(round(timestep,4))
 
     return matrice_incrocio_temp
 
@@ -331,6 +332,8 @@ def isLibero(passaggio_temp, matrice_incrocio_temp, passaggio_cella_temp, limiti
 def avantiAuto(auto_temp, passaggio_temp, attesa_temp, ferme_temp, matrice_incrocio_temp, passaggio_cella_temp,
                traiettorie_matrice_temp, estremi_incrocio, x_auto_in_celle_temp, y_auto_in_celle_temp):
     # faccio avanzare auto
+
+    traci.vehicle.setSpeedMode(auto_temp, 30)
 
     traci.vehicle.setSpeed(auto_temp, traci.vehicle.getMaxSpeed(auto_temp))  # riparte l'auto
     passaggio_temp.append([auto_temp, traci.vehicle.getRoadID(auto_temp), traci.vehicle.getAngle(auto_temp)])
@@ -508,7 +511,7 @@ def generaVeicoli(n_auto_t, t_gen):
         id_veh = "veh_" + str(i)
 
         # 4 istruzioni sotto permettono di cambiare velocita' massima e accelerazione/decelerazione per la simulazione
-        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "13.888888")
+        traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "8.33333")
 
 
 def pulisci_matrice(matrice_incrocio_temp, sec_sicurezza_temp):
@@ -523,7 +526,7 @@ def pulisci_matrice(matrice_incrocio_temp, sec_sicurezza_temp):
                 for val in matrice_incrocio_temp[index_incr][index_y][index_x]:
                     # print(val)
                     index_val = matrice_incrocio_temp[index_incr][index_y][index_x].index(val)
-                    if val < (traci.simulation.getTime() - sec_sicurezza_temp - 10):
+                    if val < (traci.simulation.getTime() - sec_sicurezza_temp - 1):
                         matrice_incrocio[index_incr][index_y][index_x].pop(index_val)
 
     return matrice_incrocio
@@ -590,6 +593,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
     limiti_celle_Y = []  # utile per verificare l'appartenenza ad una cella all'interno della matrice dell'incrocio
     passaggio_cella = []  # salvo in che cella si trova l'auto in passaggio [incrID][ [ auto , cella_X , cella_Y ],... ]
     consumo = dict()  # lista di consumi rilevati per ogni auto (in un dizionario)
+    rallentate = []  # lista di auto rallentate in prossimita' dell'incrocio
 
     rientro4 = [passaggio, attesa, ferme, matrice_incrocio]
 
@@ -623,6 +627,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
         lista_uscita.append([])
         ferme.append([])
         passaggio.append([])
+        rallentate.append([])
         passaggio_cella.insert(incrID, [])
 
         centerJunctID.append(traci.junction.getPosition(incrNome))  # posizione centro dell'incrocio
@@ -684,8 +689,8 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
 
                     stop_temp = stop[incrID]
                     if len(stop_temp) > 3:  # se ci sono i 4 lati dell'incrocio
-                        if (stop_temp[3] - 26 <= pos[0] <= stop_temp[1] + 26) and \
-                                (stop_temp[2] - 26 <= pos[1] <= stop_temp[0] + 26):  # 1 +16 m to stop from 30km/h
+                        if (stop_temp[3] - 16 <= pos[0] <= stop_temp[1] + 16) and \
+                                (stop_temp[2] - 16 <= pos[1] <= stop_temp[0] + 16):  # to stop from 50km/h
 
                             leader = traci.vehicle.getLeader(auto)  # salvo il leader (nome_auto, distanza)
                             if leader:
@@ -694,7 +699,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
 
                             if not leader:  # se non c'e' leader
                                 # controllo se auto non ha subito rallentamenti e la fermo in 16 m
-                                if traci.vehicle.getSpeed(auto) == 1:
+                                if round(traci.vehicle.getSpeed(auto), 2) == round(traci.vehicle.getMaxSpeed(auto), 2):
                                     rientro4 = arrivoAuto(auto, passaggio[incrID], ferme[incrID], attesa[incrID],
                                                           matrice_incrocio[incrID], passaggio_cella[incrID],
                                                           traiettorie_matrice, stop[incrID], sec_sicurezza,
@@ -787,12 +792,12 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
                 tempo_coda[incrID] = output_t_in_coda(arrayAuto, tempo_coda[incrID], step, attesa[incrID])
 
             # STAMPO LA MATRICE
-            # print(traci.simulation.getTime())
-            # print(passaggio[incrID])
-            # print(passaggio_cella[incrID])
-            # for x in matrice_incrocio[incrID]:  # matrice
-            #     print(x)
-            # print("\n\n")
+            print(traci.simulation.getTime())
+            print(passaggio[incrID])
+            print(passaggio_cella[incrID])
+            for x in matrice_incrocio[incrID]:  # matrice
+                print(x)
+            print("\n\n")
 
         if int(step / step_incr) % 8 == 0:  # ogni 8 step ne calcola output
             file_rit = output(arrayAuto, auto_in_simulazione, consumo)  # per generare stringhe di output
