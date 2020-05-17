@@ -105,11 +105,12 @@ def t_arrivo_cella(auto_temp, metri_da_incrocio_temp, metri_da_cella_temp):  # r
     a = traci.vehicle.getAccel(auto_temp)
     # print vi, vf, a # CORRETTI
 
-    t = - (vi / a) + (math.sqrt((vi * vi) + (float(2) * a * (metri_da_cella_temp - metri_da_incrocio_temp))) / a) + \
-        (metri_da_cella_temp / vf) - (((vf * vf) - (vi * vi)) / (float(2) * a * vf)) + (metri_da_incrocio_temp / vf)
+    xa = (((vf * vf) - (vi * vi)) / (float(2) * a)) + metri_da_incrocio_temp
+    t1 = (- vi + math.sqrt((vi * vi) + (float(2) * a) * (xa - metri_da_incrocio_temp))) / a
+    t2 = (metri_da_cella_temp - xa) / vf
+    t = t1 + t2
     t = round(t, 4)
 
-    print metri_da_incrocio_temp, metri_da_cella_temp, t
     return t + traci.simulation.getTime()
 
 
@@ -118,8 +119,8 @@ def celle_occupate_data_ang(ang, x_auto_in_celle_temp, y_auto_in_celle_temp):
     celle_occupate = []
     ang = ang % 180
     ang = - ang
-    x_auto = x_auto_in_celle_temp * 1.3
-    y_auto = y_auto_in_celle_temp
+    x_auto = x_auto_in_celle_temp * 1.2
+    y_auto = y_auto_in_celle_temp * 1.1
     # print(x_auto)
     # print(y_auto)
     # print("\n")
@@ -678,7 +679,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
 
             for auto in arrayAuto:  # scorro l'array delle auto ancora presenti nella simulazione
 
-                # print(auto + ": " + str(traci.vehicle.getSpeed(auto)))
+                # print(auto + ": " + str(traci.vehicle.getSpeed(auto))+" "+str(traci.vehicle.getMaxSpeed(auto)))
 
                 auto_in_lista = True
                 try:  # vedo se auto e' in lista tra le auto segnate per attraversare l'incrocio
@@ -811,6 +812,8 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
             for auto_uscita in passaggio_precedente[incrID]:
                 if auto_uscita not in passaggio[incrID]:
                     traci.vehicle.setMaxSpeed(auto_uscita[0], 13.888888)
+                    traci.vehicle.setSpeed(auto_uscita[0], 13.888888)
+                    traci.vehicle.setSpeedMode(auto_uscita[0], 7)
             passaggio_precedente[incrID] = passaggio[incrID][:]
 
         # STAMPO LA MATRICE

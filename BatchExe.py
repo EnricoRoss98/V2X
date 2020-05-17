@@ -22,11 +22,11 @@ cons0 = open("Output0/consumo.txt")  # scrivo consumo medio e massimo rispetto c
 #
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
-from_auto_test = 1  # (per simulazione impostare a 10)
-to_auto_test = 1  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
+from_auto_test = 10  # (per simulazione impostare a 10)
+to_auto_test = 10  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
 step_auto_test = 1  # (per simulazione impostare a 10)
 prove_fissate_auto = 1  # (per simulazione impostare a 10)
-gui = True
+gui = False
 n_porta_base = 5000
 celle_per_lato = 20  # per protocolli basati sulla suddivisione matriciale dell'incrocio
 secondi_di_sicurezza = 0.5
@@ -35,7 +35,7 @@ secondi_di_sicurezza = 0.5
 #
 #
 
-tempo_generazione = 43.2  # fissato
+tempo_generazione = 1  # fissato
 lines1 = f0.readlines()
 lines2 = vm0.readlines()
 lines3 = cm0.readlines()
