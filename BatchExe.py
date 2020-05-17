@@ -35,7 +35,7 @@ secondi_di_sicurezza = 0.5
 #
 #
 
-tempo_generazione = 1  # fissato
+tempo_generazione = 43.2  # fissato
 lines1 = f0.readlines()
 lines2 = vm0.readlines()
 lines3 = cm0.readlines()
