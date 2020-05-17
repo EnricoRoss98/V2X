@@ -38,7 +38,7 @@ def limiti_celle(estremi_incrocio, celle_per_lato):
     lungh_cella_X = float(lunghezza_X) / float(celle_per_lato)
     lungh_cella_Y = float(lunghezza_Y) / float(celle_per_lato)
 
-    for i in range(0, celle_per_lato+1):  # scrivo sui vettori
+    for i in range(0, celle_per_lato + 1):  # scrivo sui vettori
         limiti_celle_X_temp.append(round((estremi_incrocio[3] + (lungh_cella_X * i)), 3))
         limiti_celle_Y_temp.append(round((estremi_incrocio[0] - (lungh_cella_Y * i)), 3))
 
@@ -78,8 +78,6 @@ def costruzioneArray(arrayAuto_temp):  # costruzione dell'array composto dal nom
     for id_auto in loadedIDList:
         if id_auto not in arrayAuto_temp:
             arrayAuto_temp.append(id_auto)
-            traci.vehicle.setSpeed(id_auto, 8.33333)
-            traci.vehicle.setSpeedMode(id_auto, 0)
             # print("AUTO INSERT " + id_auto)
 
     arrivedIDList = traci.simulation.getArrivedIDList()  # elimina nell'array le auto arrivate
@@ -107,7 +105,9 @@ def generaVeicoli():
 
             route = "route_" + str(r_route)
             id_veh = "veh_" + str(i)
-            traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "0.5")
+            traci.vehicle.add(id_veh, route, "Car", str(r_depart), lane, "base", "6.944444")
+            traci.vehicle.setMaxSpeed(id_veh, 6.944444)
+            traci.vehicle.setSpeedMode(id_veh, 0)
 
 
 def run(port_t, gui, celle_per_lato):
@@ -146,7 +146,7 @@ def run(port_t, gui, celle_per_lato):
 
     traci.init(PORT)
     step = 0.000
-    step_incr = 0.032
+    step_incr = 0.036
 
     generaVeicoli()  # genero veicoli
 
@@ -295,8 +295,10 @@ def run(port_t, gui, celle_per_lato):
     # for x in time_entrata_in_incrocio:
     #     print(x)
     # print("\n\n")
-    # for x in ret_lista_occupazione_celle:
-    #     print(x)
+    print limiti_celle_X
+    print limiti_celle_Y
+    for x in ret_lista_occupazione_celle:
+        print(x)
 
     traci.close()
     return ret_lista_occupazione_celle
