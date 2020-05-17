@@ -295,8 +295,8 @@ def run(port_t, gui, celle_per_lato):
     # for x in time_entrata_in_incrocio:
     #     print(x)
     # print("\n\n")
-    print limiti_celle_X
-    print limiti_celle_Y
+    # print limiti_celle_X
+    # print limiti_celle_Y
     for x in ret_lista_occupazione_celle:
         print(x)
 

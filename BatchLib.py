@@ -103,10 +103,13 @@ def t_arrivo_cella(auto_temp, metri_da_incrocio_temp, metri_da_cella_temp):  # r
     vi = traci.vehicle.getSpeed(auto_temp)
     vf = traci.vehicle.getMaxSpeed(auto_temp)
     a = traci.vehicle.getAccel(auto_temp)
+    # print vi, vf, a # CORRETTI
 
-    t = - (vi / a) + (math.sqrt((vi * vi) + (2 * a * (metri_da_cella_temp - metri_da_incrocio_temp))) / a) + \
-        (metri_da_cella_temp / vf) - (((vf * vf) - (vi * vi)) / (2 * a * vf)) + (metri_da_incrocio_temp / vf)
+    t = - (vi / a) + (math.sqrt((vi * vi) + (float(2) * a * (metri_da_cella_temp - metri_da_incrocio_temp))) / a) + \
+        (metri_da_cella_temp / vf) - (((vf * vf) - (vi * vi)) / (float(2) * a * vf)) + (metri_da_incrocio_temp / vf)
     t = round(t, 4)
+
+    print metri_da_incrocio_temp, metri_da_cella_temp, t
     return t + traci.simulation.getTime()
 
 
@@ -665,8 +668,8 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
     y_auto_in_m = traci.vehicle.getLength("veh_0")
     x_auto_in_celle = float(x_auto_in_m) / float(x_cella_in_m)
     y_auto_in_celle = float(y_auto_in_m) / float(y_cella_in_m)
-    print(x_auto_in_celle)
-    print(y_auto_in_celle)
+    # print(x_auto_in_celle)
+    # print(y_auto_in_celle)
 
     while traci.simulation.getMinExpectedNumber() > 0:  # fino a quando tt le auto da inserire hanno terminato la corsa
 
@@ -814,9 +817,9 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
         # print(traci.simulation.getTime())
         # print(passaggio[incrID])
         # print(passaggio_cella[incrID])
-        for x in matrice_incrocio[incrID]:  # matrice
-            print(x)
-        print("\n\n")
+        # for x in matrice_incrocio[incrID]:  # matrice
+        #     print(x)
+        # print("\n\n")
 
         if int(step / step_incr) % 8 == 0:  # ogni 8 step ne calcola output
             file_rit = output(arrayAuto, auto_in_simulazione, consumo)  # per generare stringhe di output
