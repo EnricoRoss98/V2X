@@ -22,10 +22,10 @@ cons0 = open("Output0/consumo.txt")  # scrivo consumo medio e massimo rispetto c
 #
 # -------------------- VARIABILI MODIFICABILI -------------------- #
 
-from_auto_test = 10  # (per simulazione impostare a 10)
-to_auto_test = 10  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
-step_auto_test = 1  # (per simulazione impostare a 10)
-prove_fissate_auto = 1  # (per simulazione impostare a 10)
+from_auto_test = 50  # (per simulazione impostare a 10)
+to_auto_test = 200  # (per simulazione impostare a 100 o 200 se abbasatanza efficente)
+step_auto_test = 50  # (per simulazione impostare a 10)
+prove_fissate_auto = 20  # (per simulazione impostare a 10)
 gui = False
 n_porta_base = 5000
 celle_per_lato = 20  # per protocolli basati sulla suddivisione matriciale dell'incrocio
@@ -197,17 +197,17 @@ for x in range(from_auto_test, to_auto_test + 1):
             consumo_med_s = string_vett2[0] + "," + string_vett2[1]
         cons.write(str(x) + " " + consumo_max_s + " " + consumo_med_s + "\n")
 
-    t.close()
-    f.close()
-    cm.close()
-    vm.close()
-    t_coda.close()
-    cons.close()
-    t0.close()
-    f0.close()
-    cm0.close()
-    vm0.close()
-    t_coda0.close()
-    cons0.close()
-    print("\n\n\n\n\n\n\n")
-    print("FINE")
+t.close()
+f.close()
+cm.close()
+vm.close()
+t_coda.close()
+cons.close()
+t0.close()
+f0.close()
+cm0.close()
+vm0.close()
+t_coda0.close()
+cons0.close()
+print("\n\n\n\n\n\n\n")
+print("FINE")
