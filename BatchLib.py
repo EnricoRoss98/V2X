@@ -139,9 +139,9 @@ def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valo
         # print(traci.vehicle.getElectricityConsumption(auto_temp))
         if auto_temp not in consumo_temp:
             consumo_temp[auto_temp] = []
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 4)
+            consumo_temp[auto_temp].append(traci.vehicle.getFuelConsumption(auto_temp) * 4)
         else:
-            consumo_temp[auto_temp].append(traci.vehicle.getElectricityConsumption(auto_temp) * 4)
+            consumo_temp[auto_temp].append(traci.vehicle.getFuelConsumption(auto_temp) * 4)
 
     return consumo_temp
 
