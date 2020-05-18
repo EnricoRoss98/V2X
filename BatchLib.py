@@ -104,8 +104,10 @@ def t_arrivo_cella(auto_temp, metri_da_incrocio_temp, metri_da_cella_temp):  # r
     vf = traci.vehicle.getMaxSpeed(auto_temp)
     a = traci.vehicle.getAccel(auto_temp)
 
-    t = - (vi / a) + (math.sqrt((vi * vi) + (2 * a * (metri_da_cella_temp - metri_da_incrocio_temp))) / a) + \
-        (metri_da_cella_temp / vf) - (((vf * vf) - (vi * vi)) / (2 * a * vf)) + (metri_da_incrocio_temp / vf)
+    xa = (((vf * vf) - (vi * vi)) / (float(2) * a)) + metri_da_incrocio_temp
+    t1 = (- vi + math.sqrt((vi * vi) + (float(2) * a) * (xa - metri_da_incrocio_temp))) / a
+    t2 = (metri_da_cella_temp - xa) / vf
+    t = t1 + t2
     t = round(t, 3)
     return t + traci.simulation.getTime()
 
