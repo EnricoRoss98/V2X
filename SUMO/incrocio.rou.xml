@@ -41,20 +41,7 @@
 -->
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <vType id="Car" maxSpeed="13.88888" vClass="passenger" accel="2.2" decel="2.2" lcKeepRight="0.0"  emissionClass="Energy/unknown">
-        <param key="has.battery.device" value="true"/>
-        <param key="maximumBatteryCapacity" value="40000"/>
-        <param key="maximumPower" value="110000"/>
-        <param key="vehicleMass" value="1500"/>
-        <param key="frontSurfaceArea" value="0.58"/>
-        <param key="airDragCoefficient" value="0.29"/>
-        <param key="internalMomentOfInertia" value="0.01"/>
-        <param key="radialDragCoefficient" value="0.5"/>
-        <param key="rollDragCoefficient" value="0.01"/>
-        <param key="constantPowerIntake" value="100"/>
-        <param key="propulsionEfficiency" value="0.9"/>
-        <param key="recuperationEfficiency" value="0.9"/>
-        <param key="stoppingTreshold" value="0"/>
+    <vType id="Car" maxSpeed="13.88888" vClass="passenger" accel="2.2" decel="2.2" lcKeepRight="0.0"  emissionClass="HBEFA3/PC_G_EU6">
     </vType>
     <route edges="sotto-to-centr centr-to-sinis" color="green" id="route_0"/>
     <route edges="sotto-to-centr centr-to-sopra" color="green" id="route_1"/>
