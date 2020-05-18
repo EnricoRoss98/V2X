@@ -4,8 +4,8 @@ from multiprocessing import Pool
 
 direct = "~/SUMO/"  # percorso cartella
 
-cons = open("Output/consumo.txt", "w")  # scrivo consumo medio e massimo rispetto consumo in assenza di traffico (%)
-cons0 = open("Output0/consumo.txt")  # scrivo consumo medio e massimo rispetto consumo in assenza di traffico (%)
+cons = open("Output/consumo2.txt", "w")  # scrivo consumo medio e massimo rispetto consumo in assenza di traffico (%)
+cons0 = open("Output0/consumo2.txt")  # scrivo consumo medio e massimo rispetto consumo in assenza di traffico (%)
 
 #
 #
