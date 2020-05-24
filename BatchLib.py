@@ -564,14 +564,14 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
             # controllo per cambio strategia di passaggio se non passano auto (o poche) tra due rilevazioni successive
             if conta_passaggi_old[incrID] > 4:  # permetto in questo modo alle auto di accelerarsi e arrivare a regime
-                if int(step / step_incr) % 25 == 0:  # controllo contatore passaggi
+                if int(step / step_incr) % 45 == 0:  # controllo contatore passaggi
                     if conta_passaggi_old[incrID] + 1 < conta_passaggi[incrID]:
                         conta_passaggi_old[incrID] = conta_passaggi[incrID]
                     else:
                         conta_passaggi[incrID] = 0
                         conta_passaggi_old[incrID] = 0
             else:
-                if int(step / step_incr) % 35 == 0:  # controllo contatore passaggi
+                if int(step / step_incr) % 65 == 0:  # controllo contatore passaggi
                     if conta_passaggi_old[incrID] < conta_passaggi[incrID]:
                         conta_passaggi_old[incrID] = conta_passaggi[incrID]
                     else:
