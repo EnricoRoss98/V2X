@@ -133,33 +133,6 @@ def coloreAuto(arrayAuto_temp, junctIDList_temp, attesa_temp, ferme_temp):  # co
             traci.vehicle.setColor(auto_temp, (0, 255, 0))
 
 
-def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valori per scrivere nei file di output
-    # calcoli per file ferme, vel_med e consumo
-    for auto_temp in arrayAuto_temp:
-        # print(traci.vehicle.getElectricityConsumption(auto_temp))
-        if auto_temp not in consumo_temp:
-            consumo_temp[auto_temp] = []
-            consumo_temp[auto_temp].append(traci.vehicle.getFuelConsumption(auto_temp) * 4)
-        else:
-            consumo_temp[auto_temp].append(traci.vehicle.getFuelConsumption(auto_temp) * 4)
-
-    return consumo_temp
-
-
-def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
-    # scrittura nell'array auto_coda per il calcolo del tempo in coda medio rispetto al tempo totale di simulazione
-    for auto_temp in arrayAuto_temp:
-        split = str(auto_temp).rsplit("_")
-        auto_temp_ID = int(split[1])
-        if auto_coda_temp[auto_temp_ID][0] == 0:
-            if round(traci.vehicle.getSpeed(auto_temp), 3) == 0:  # se auto ferma allora segno timestep inizio coda
-                auto_coda_temp[auto_temp_ID][0] = step_temp
-        if auto_coda_temp[auto_temp_ID][0] != 0 and auto_coda_temp[auto_temp_ID][1] == 0 and \
-                auto_temp not in attesa_temp:  # se non e' piu' in attesa allora segno timestep di fine coda
-            auto_coda_temp[auto_temp_ID][1] = step_temp
-    return auto_coda_temp
-
-
 def generaVeicoli(n_auto_t, t_gen):
     r_depart = 0.0
     lane = 0
@@ -205,7 +178,7 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
     # print(sumoBinary)
     sumoProcess = subprocess.Popen(
         [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "--time-to-teleport", "-1", "-Q",
-         "--step-length", "0.001"],
+         "--step-length", "0.036"],
         stdout=sys.stdout,
         stderr=sys.stderr)
 
@@ -494,22 +467,19 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
             # controllo per cambio strategia di passaggio se non passano auto (o poche) tra due rilevazioni successive
             if conta_passaggi_old[incrID] > 4:  # permetto in questo modo alle auto di accelerarsi e arrivare a regime
-                if int(step / step_incr) % 25 == 0:  # controllo contatore passaggi
+                if int(step / step_incr) % 45 == 0:  # controllo contatore passaggi
                     if conta_passaggi_old[incrID] + 1 < conta_passaggi[incrID]:
                         conta_passaggi_old[incrID] = conta_passaggi[incrID]
                     else:
                         conta_passaggi[incrID] = 0
                         conta_passaggi_old[incrID] = 0
             else:
-                if int(step / step_incr) % 35 == 0:  # controllo contatore passaggi
+                if int(step / step_incr) % 65 == 0:  # controllo contatore passaggi
                     if conta_passaggi_old[incrID] < conta_passaggi[incrID]:
                         conta_passaggi_old[incrID] = conta_passaggi[incrID]
                     else:
                         conta_passaggi[incrID] = 0
                         conta_passaggi_old[incrID] = 0
-
-        if int(step / step_incr) % 4 == 0:  # ogni 4 step ne calcola output
-            consumo = output(arrayAuto, auto_in_simulazione, consumo)  # per generare stringhe di output
 
         coloreAuto(arrayAuto, junctIDList, attesa, ferme)  # assegna colori alle auto
 
@@ -519,28 +489,4 @@ def run(port_t, n_auto, t_generazione, gui, max_auto_insieme):
 
         arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione
 
-    #
-    # ---------- genero output e lo rimando indietro ----------
-    consumo_totale_per_auto = dict()
-
-    for auto_temp in consumo:
-        consumo_totale = 0
-        lista_consumi = consumo[auto_temp]
-        for x in lista_consumi:
-            consumo_totale += x
-        consumo_totale_per_auto[auto_temp] = consumo_totale
-
-    # calcolo consumo massimo e medio
-    consumo_massimo = 0.0
-    consumo_medio = 0.0
-    for x in consumo_totale_per_auto:
-        consumo_medio += consumo_totale_per_auto.get(x)
-        if consumo_totale_per_auto.get(x) > consumo_massimo:
-            consumo_massimo = consumo_totale_per_auto.get(x)
-    consumo_medio = round(consumo_medio / float(n_auto), 4)
-    consumo_massimo = round(consumo_massimo, 4)
-    # print(consumo_medio)
-    # print(consumo_massimo)
-
     traci.close()
-    return consumo_massimo, consumo_medio
