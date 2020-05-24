@@ -403,33 +403,6 @@ def coloreAuto(arrayAuto_temp, junctIDList_temp, attesa_temp, ferme_temp):  # co
             traci.vehicle.setColor(auto_temp, (0, 255, 0))
 
 
-def output(arrayAuto_temp, auto_in_simulazione_t, consumo_temp):  # preparo valori per scrivere nei file di output
-    # calcoli per file ferme, vel_med e consumo
-    for auto_temp in arrayAuto_temp:
-        # print(traci.vehicle.getElectricityConsumption(auto_temp))
-        if auto_temp not in consumo_temp:
-            consumo_temp[auto_temp] = []
-            consumo_temp[auto_temp].append(traci.vehicle.getFuelConsumption(auto_temp) * 8)
-        else:
-            consumo_temp[auto_temp].append(traci.vehicle.getFuelConsumption(auto_temp) * 8)
-
-    return consumo_temp
-
-
-def output_t_in_coda(arrayAuto_temp, auto_coda_temp, step_temp, attesa_temp):
-    # scrittura nell'array auto_coda per il calcolo del tempo in coda medio rispetto al tempo totale di simulazione
-    for auto_temp in arrayAuto_temp:
-        split = str(auto_temp).rsplit("_")
-        auto_temp_ID = int(split[1])
-        if auto_coda_temp[auto_temp_ID][0] == 0:
-            if round(traci.vehicle.getSpeed(auto_temp), 3) == 0:  # se auto ferma allora segno timestep inizio coda
-                auto_coda_temp[auto_temp_ID][0] = step_temp
-        if auto_coda_temp[auto_temp_ID][0] != 0 and auto_coda_temp[auto_temp_ID][1] == 0 and \
-                auto_temp not in attesa_temp:  # se non e' piu' in attesa allora segno timestep di fine coda
-            auto_coda_temp[auto_temp_ID][1] = step_temp
-    return auto_coda_temp
-
-
 def generaVeicoli(n_auto_t, t_gen):
     r_depart = 0
     lane = 0
@@ -497,7 +470,7 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
     # print(sumoBinary)
     sumoProcess = subprocess.Popen(
         [sumoBinary, "-c", direct + config_sumo, "--remote-port", str(PORT), "--time-to-teleport", "-1", "-Q",
-         "--step-length", "0.001"],
+         "--step-length", "0.036"],
         stdout=sys.stdout,
         stderr=sys.stderr)
     # sumoProcess = subprocess.Popen(
@@ -733,26 +706,15 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
                                 matrice_incrocio[incrID] = rientro4[3]
                                 passaggio_cella[incrID] = rientro4[4]
 
-        if int(step / step_incr) % 10 == 0:  # riaccelero i veicoli all'uscita dall'incrocio
-            # print(passaggio_precedente[incrID])
-            # print(passaggio[incrID])
-            for auto_uscita in passaggio_precedente[incrID]:
-                if auto_uscita not in passaggio[incrID]:
-                    traci.vehicle.setMaxSpeed(auto_uscita[0], 13.888888)
-                    traci.vehicle.setSpeed(auto_uscita[0], 13.888888)
-                    traci.vehicle.setSpeedMode(auto_uscita[0], 7)
-            passaggio_precedente[incrID] = passaggio[incrID][:]
-
-        # STAMPO LA MATRICE
-        # print(traci.simulation.getTime())
-        # print(passaggio[incrID])
-        # print(passaggio_cella[incrID])
-        # for x in matrice_incrocio[incrID]:  # matrice
-        #     print(x)
-        # print("\n\n")
-
-        if int(step / step_incr) % 8 == 0:  # ogni 8 step ne calcola output
-            consumo = output(arrayAuto, auto_in_simulazione, consumo)  # per generare stringhe di output
+            if int(step / step_incr) % 10 == 0:  # riaccelero i veicoli all'uscita dall'incrocio
+                # print(passaggio_precedente[incrID])
+                # print(passaggio[incrID])
+                for auto_uscita in passaggio_precedente[incrID]:
+                    if auto_uscita not in passaggio[incrID]:
+                        traci.vehicle.setMaxSpeed(auto_uscita[0], 13.888888)
+                        traci.vehicle.setSpeed(auto_uscita[0], 13.888888)
+                        traci.vehicle.setSpeedMode(auto_uscita[0], 7)
+                passaggio_precedente[incrID] = passaggio[incrID][:]
 
         if int(step / step_incr) % 10 == 0:  # ogni 10 step pulisco la matrice da valori troppo vecchi
             matrice_incrocio = pulisci_matrice(matrice_incrocio, sec_sicurezza)
@@ -764,29 +726,4 @@ def run(port_t, n_auto, t_generazione, gui, celle_per_lato, traiettorie_matrice,
 
         arrayAuto = costruzioneArray(arrayAuto)  # inserisco nell'array le auto presenti nella simulazione
 
-    #
-    # ---------- genero output e lo rimando indietro ----------
-    consumo_totale_per_auto = dict()
-
-    for auto_temp in consumo:
-        consumo_totale = 0
-        lista_consumi = consumo[auto_temp]
-        for x in lista_consumi:
-            consumo_totale += x
-        consumo_totale_per_auto[auto_temp] = consumo_totale
-
-    # calcolo consumo massimo e medio
-    consumo_massimo = 0.0
-    consumo_medio = 0.0
-    for x in consumo_totale_per_auto:
-        consumo_medio += consumo_totale_per_auto.get(x)
-        if consumo_totale_per_auto.get(x) > consumo_massimo:
-            consumo_massimo = consumo_totale_per_auto.get(x)
-    consumo_medio = round(consumo_medio / float(n_auto), 4)
-    consumo_massimo = round(consumo_massimo, 4)
-
-    # print(consumo_medio)
-    # print(consumo_massimo)
-
     traci.close()
-    return consumo_massimo, consumo_medio
